@@ -38,7 +38,8 @@ body {
 }
 
 .app {
-  overflow: visible; /* required for sticky children */
+  position: relative; /* anchor for the docked price bar */
+  overflow: visible;  /* required for sticky children */
 }
 
 h1,h2,h3,h4,.logo { font-family: 'Ubuntu', sans-serif; }
@@ -706,18 +707,29 @@ input:checked + .slider::before { transform: translateX(18px); }
 .material-card.active .material-name { color: var(--fuchsia); }
 
 /* ─── PRICE BAR ─── */
-/* Compact one-row bar, last child of .app. Sticky: follows the viewport bottom
-   while the configurator is on screen, then rests at the end of the section so
-   the theme footer comes after it — see PriceBar.jsx */
+/* Compact one-row bar, last child of .app. Mode is set from scroll position
+   in PriceBar.jsx: fixed to the viewport while the configurator is on screen,
+   docked at the end of .app once its bottom is reached, hidden before it. */
 .price-bar {
-  position: sticky;
+  position: fixed;
+  left: 0;
+  right: 0;
   bottom: 0;
-  z-index: 300;
+  z-index: 9999;
   background: rgba(255,255,255,.97);
   backdrop-filter: blur(16px);
   border-top: 1px solid var(--border);
   box-shadow: 0 -4px 20px rgba(0,0,0,.08);
   padding: .6rem 1.5rem calc(.6rem + env(safe-area-inset-bottom));
+}
+
+.price-bar--docked {
+  position: absolute;
+}
+
+.price-bar--hidden {
+  transform: translateY(100%);
+  visibility: hidden;
 }
 
 .price-bar-inner {
@@ -887,7 +899,7 @@ input:checked + .slider::before { transform: translateX(18px); }
 .price-sheet-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 299;
+  z-index: 9998;
   background: rgba(15,23,42,.25);
 }
 

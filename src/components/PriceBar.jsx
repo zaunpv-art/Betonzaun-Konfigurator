@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect, useRef } from 'react'
 import { buildBetonLineItems } from '../utils/cart.js'
 import { buildHolzLineItems }  from '../utils/cart.js'
 import { addToShopifyCart }    from '../utils/cart.js'
@@ -9,14 +9,19 @@ const fmt = n => n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFr
 /**
  * Compact one-row price bar: total on the left, CTA on the right.
  * The breakdown opens as a sheet above the bar instead of growing the bar.
- * Rendered as the last child of .app with position: sticky, so it follows the
- * viewport while the configurator is on screen and rests at the end of the
- * section — the theme footer comes after it instead of underneath it.
+ * Rendered as the last child of .app. Position is driven by scroll (not CSS
+ * sticky, which theme wrappers with overflow can break):
+ *   hidden — configurator not reached yet
+ *   fixed  — configurator on screen: pinned to the viewport bottom
+ *   docked — bottom of configurator reached: rests at the end of the section,
+ *            so the theme footer comes after it instead of underneath it
  */
 export default function PriceBar({ activeType, betonState, holzState }) {
   const [expanded,  setExpanded]  = useState(false)
   const [adding,    setAdding]    = useState(false)
   const [cartError, setCartError] = useState(null)
+  const [mode,      setMode]      = useState('fixed')
+  const barRef = useRef(null)
 
   const { priceFn, loading } = useShopifyPrices()
 
@@ -30,6 +35,44 @@ export default function PriceBar({ activeType, betonState, holzState }) {
 
   const total    = calcTotal(items, priceFn)
   const hasTotal = items.some(i => i.fixedPrice != null || priceFn(i.variantId) != null)
+
+  useEffect(() => {
+    const bar = barRef.current
+    const app = bar?.parentElement
+    if (!bar || !app) return
+
+    let raf = 0
+    function update() {
+      raf = 0
+      const h  = bar.offsetHeight
+      const vh = window.innerHeight
+      const r  = app.getBoundingClientRect()
+      // Reserve space at the end of the section for the docked bar
+      const pad = `${h}px`
+      if (app.style.paddingBottom !== pad) app.style.paddingBottom = pad
+      setMode(r.bottom <= vh ? 'docked' : r.top >= vh ? 'hidden' : 'fixed')
+    }
+    function schedule() {
+      if (!raf) raf = requestAnimationFrame(update)
+    }
+
+    update()
+    window.addEventListener('scroll', schedule, { passive: true })
+    window.addEventListener('resize', schedule)
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(schedule) : null
+    ro?.observe(app)
+    ro?.observe(bar)
+    return () => {
+      window.removeEventListener('scroll', schedule)
+      window.removeEventListener('resize', schedule)
+      ro?.disconnect()
+      if (raf) cancelAnimationFrame(raf)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (mode === 'hidden') setExpanded(false)
+  }, [mode])
 
   async function handleAddToCart() {
     if (shopifyItems.length === 0) {
@@ -65,7 +108,7 @@ export default function PriceBar({ activeType, betonState, holzState }) {
     <>
       {expanded && <div className="price-sheet-backdrop" onClick={() => setExpanded(false)} />}
 
-      <div className="price-bar">
+      <div ref={barRef} className={`price-bar price-bar--${mode}`}>
         {/* Breakdown sheet — slides up above the bar */}
         <div className={`price-sheet ${expanded ? 'open' : ''}`} aria-hidden={!expanded}>
           <div className="price-sheet-head">
