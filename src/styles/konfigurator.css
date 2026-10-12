@@ -706,85 +706,88 @@ input:checked + .slider::before { transform: translateX(18px); }
 .material-card.active .material-name { color: var(--fuchsia); }
 
 /* ─── PRICE BAR ─── */
-/* Sticky within the konfigurator-col — stays at bottom of viewport
-   while the configurator is visible, then scrolls away with the page */
+/* Compact one-row bar fixed to the bottom of the viewport. Hidden (slid away)
+   once the configurator scrolls out of view — see PriceBar.jsx */
 .price-bar {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   z-index: 99999; /* above theme footer */
-  background: var(--white);
+  background: rgba(255,255,255,.97);
+  backdrop-filter: blur(16px);
   border-top: 1px solid var(--border);
-  box-shadow: 0 -4px 20px rgba(0,0,0,.1);
-  padding: .9rem 1.5rem 1.1rem;
+  box-shadow: 0 -4px 20px rgba(0,0,0,.08);
+  padding: .6rem 1.5rem calc(.6rem + env(safe-area-inset-bottom));
+  transition: transform .3s ease;
+}
+
+.price-bar-hidden {
+  transform: translateY(110%);
+  pointer-events: none;
 }
 
 .price-bar-inner {
   max-width: 1280px;
   margin: 0 auto;
   display: flex;
-  flex-direction: column;
-  gap: .5rem;
-}
-
-.price-breakdown {
-  display: flex;
-  flex-direction: column;
-  gap: .15rem;
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height .3s ease;
-}
-
-.price-breakdown.expanded {
-  max-height: 200px;
-}
-
-.price-line {
-  display: flex;
-  justify-content: space-between;
-  font-size: .94rem;
-  color: var(--gray-500);
-}
-
-.price-line strong { color: var(--gray-700); }
-
-.price-total-row {
-  display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 1rem;
+}
+
+.price-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: .15rem;
+  background: none;
+  border: none;
+  padding: 0;
   cursor: pointer;
+  text-align: left;
+  min-width: 0;
 }
 
-.price-label {
-  font-size: .94rem;
-  color: var(--gray-500);
-  font-weight: 500;
-}
-
-.price-note {
-  font-size: .86rem;
-  color: var(--gray-400);
-}
+.price-summary:disabled { cursor: default; }
 
 .price-amount {
   font-family: 'Ubuntu', sans-serif;
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   font-weight: 800;
   color: var(--navy);
   line-height: 1;
+  white-space: nowrap;
+}
+
+.price-note {
+  font-size: .78rem;
+  color: var(--gray-400);
+  white-space: nowrap;
+}
+
+.price-details-link {
+  color: var(--blue);
+  font-weight: 600;
+}
+
+.price-error {
+  max-width: 1280px;
+  margin: .35rem auto 0;
+  font-size: .75rem;
+  color: #dc2626;
+  text-align: right;
 }
 
 .cta-btn {
-  width: 100%;
-  padding: .85rem 1rem;
+  flex-shrink: 0;
+  padding: .8rem 1.6rem;
   background: linear-gradient(135deg, var(--fuchsia), #c2136c);
   color: var(--white);
   border: none;
   border-radius: var(--radius);
   font-family: 'Ubuntu', sans-serif;
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
   transition: all .22s;
@@ -793,6 +796,7 @@ input:checked + .slider::before { transform: translateX(18px); }
   justify-content: center;
   gap: .5rem;
   box-shadow: 0 4px 14px rgba(233,30,140,.35);
+  white-space: nowrap;
 }
 
 .cta-btn:hover {
@@ -801,6 +805,7 @@ input:checked + .slider::before { transform: translateX(18px); }
 }
 
 .cta-btn:active { transform: translateY(0); }
+.cta-btn:disabled { opacity: .7; cursor: wait; }
 
 .cta-arrow {
   font-size: 1.15rem;
@@ -809,11 +814,92 @@ input:checked + .slider::before { transform: translateX(18px); }
 
 .cta-btn:hover .cta-arrow { transform: translateX(4px); }
 
-.price-disclaimer {
-  font-size: .97rem;
-  color: var(--gray-400);
-  text-align: center;
+/* Breakdown sheet — sits above the bar, slides up when opened */
+.price-sheet {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  width: min(560px, 100%);
+  max-height: min(60vh, 480px);
+  display: flex;
+  flex-direction: column;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-radius: 1rem 1rem 0 0;
+  box-shadow: 0 -10px 30px rgba(0,0,0,.12);
+  transform: translate(-50%, 16px);
+  opacity: 0;
+  visibility: hidden;
+  transition: transform .25s ease, opacity .25s ease, visibility .25s;
 }
+
+.price-sheet.open {
+  transform: translate(-50%, 0);
+  opacity: 1;
+  visibility: visible;
+}
+
+.price-sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .8rem 1.1rem;
+  border-bottom: 1px solid var(--gray-100);
+  font-family: 'Ubuntu', sans-serif;
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--gray-400);
+}
+
+.price-sheet-close {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--gray-400);
+  cursor: pointer;
+}
+
+.price-sheet-close:hover { color: var(--gray-900); }
+
+.price-sheet-list {
+  overflow-y: auto;
+  padding: .4rem 1.1rem .8rem;
+}
+
+.price-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: .75rem;
+  padding: .4rem 0;
+  font-size: .86rem;
+  color: var(--gray-500);
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.price-line:last-child { border-bottom: none; }
+.price-line-qty { color: var(--gray-400); font-weight: 700; white-space: nowrap; }
+
+.price-line-val {
+  font-family: 'Ubuntu', sans-serif;
+  font-weight: 700;
+  color: var(--gray-900);
+  white-space: nowrap;
+}
+
+.price-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 99998;
+  background: rgba(15,23,42,.25);
+}
+
+/* Room for the fixed bar so the last step is never hidden behind it */
+.konfigurator-col { padding-bottom: 5.5rem; }
 
 
 /* ═══════════════════════════════════════════════
@@ -960,9 +1046,12 @@ input:checked + .slider::before { transform: translateX(18px); }
   .gallery-components-total { font-size: .88rem; }
 
   /* Price bar */
-  .price-bar { padding: .75rem 1rem .9rem; }
-  .price-amount { font-size: 1.5rem; }
-  .cta-btn { font-size: .88rem; padding: .8rem 1rem; }
+  .price-bar { padding: .55rem .75rem calc(.55rem + env(safe-area-inset-bottom)); }
+  .price-bar-inner { gap: .6rem; }
+  .price-amount { font-size: 1.2rem; }
+  .price-note { font-size: .68rem; }
+  .cta-btn { font-size: .88rem; padding: .75rem 1rem; }
+  .price-sheet { width: 100%; border-left: none; border-right: none; }
 
   /* Info/calc notes */
   .calc-note { font-size: .78rem; }
@@ -1199,10 +1288,9 @@ input:checked + .slider::before { transform: translateX(18px); }
   color: var(--navy);
 }
 
-@media (max-width: 900px) {
-  .price-bar {
-    padding: .75rem 1rem 1rem;
-  }
+@media (max-width: 380px) {
+  .cta-arrow { display: none; }
+  .price-details-link { display: none; }
 }
 
 /* ── Mobile gallery adjustments ── */
@@ -1253,4 +1341,75 @@ input:checked + .slider::before { transform: translateX(18px); }
   font-size: .76rem;
   color: #a16207;
   line-height: 1.5;
+}
+
+
+/* ═══════════════════════════════════════════════
+   PLATE PILLS (Plattenhöhe) — weight + DIY tag
+═══════════════════════════════════════════════ */
+
+.plate-pills .toggle-pills { padding-top: .55rem; }
+
+.plate-pills .toggle-pill {
+  position: relative;
+  white-space: normal;
+  padding: .7rem .5rem .6rem;
+  line-height: 1.2;
+}
+
+.pill-sub {
+  display: block;
+  margin-top: .2rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .72rem;
+  font-weight: 500;
+  opacity: .75;
+}
+
+.pill-tag {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -55%);
+  background: #16a34a;
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-size: .62rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: .15rem .55rem;
+  border-radius: 1rem;
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+}
+
+/* ─── HEIGHT NOTE (Bauhöhe ohne Abdeckungen) ─── */
+.height-note {
+  margin-top: .5rem;
+  font-size: .78rem;
+  color: var(--gray-400);
+}
+
+/* ─── BEIDSEITIG NOTE ─── */
+.beidseitig-note {
+  display: flex;
+  align-items: flex-start;
+  gap: .5rem;
+  margin-top: .75rem;
+  padding: .5rem .75rem;
+  background: var(--gray-50);
+  border: 1px solid var(--border);
+  border-radius: .55rem;
+  font-size: .8rem;
+  color: var(--gray-500);
+  line-height: 1.45;
+}
+
+.beidseitig-note strong { color: var(--gray-900); }
+
+.beidseitig-icon {
+  color: var(--fuchsia);
+  font-weight: 800;
+  flex-shrink: 0;
 }

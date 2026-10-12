@@ -8,7 +8,7 @@ export default function StepLaenge({ state }) {
   const sections = calcSections(laenge)
 
   return (
-    <Step num="05" title="Zaunlänge" sub="Gesamtlänge Ihres Zauns in Metern">
+    <Step num="04" title="Zaunlänge" sub="Gesamtlänge Ihres Zauns in Metern">
       <LengthStepper value={laenge} onChange={setLaenge} />
     </Step>
   )

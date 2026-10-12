@@ -6,7 +6,7 @@ import { BETON_BAGS } from '../../data/betonData.js'
 import { COLORS } from '../../data/betonData.js'
 import { calcSections, calcPfosten } from '../../utils/calculations.js'
 
-export default function StepZubehor({ state, stepNum = '10' }) {
+export default function StepZubehor({ state, stepNum = '09' }) {
   const {
     beton, setBeton, betonLocked,
     torSize, setTorSize,

@@ -7,14 +7,26 @@ export default function StepHeight({ state }) {
   const { plateHeight, buildHeight, setPlateHeight, setBuildHeight } = state
 
   const plateOptions = [
-    { id: '26', label: '26 cm Platten' },
-    { id: '36', label: '36 cm Platten' },
+    {
+      id: '26',
+      label: (
+        <>
+          <span className="pill-tag">Ideal für DIY</span>
+          26 cm Platten
+          <span className="pill-sub">ca. 40 kg · von 2 Personen tragbar</span>
+        </>
+      ),
+    },
+    {
+      id: '36',
+      label: (
+        <>
+          36 cm Platten
+          <span className="pill-sub">ca. 60 kg</span>
+        </>
+      ),
+    },
   ]
-
-  const heightOptions = BUILD_HEIGHTS[plateHeight].map(h => ({
-    id: h.cm,
-    label: <>{h.label}<span className="height-sub">{h.sub}</span></>,
-  }))
 
   return (
     <Step num="02" title="Plattenhöhe & Bauhöhe" sub="Plattenformat und Gesamthöhe des Zauns">
@@ -22,7 +34,9 @@ export default function StepHeight({ state }) {
         <span className="field-label">Plattenhöhe</span>
         <span className="field-val">{plateHeight} cm</span>
       </div>
-      <TogglePills options={plateOptions} activeId={plateHeight} onSelect={setPlateHeight} />
+      <div className="plate-pills">
+        <TogglePills options={plateOptions} activeId={plateHeight} onSelect={setPlateHeight} />
+      </div>
 
       <div className="label-row" style={{ marginTop: '1.1rem' }}>
         <span className="field-label">Bauhöhe</span>
@@ -39,6 +53,9 @@ export default function StepHeight({ state }) {
             <span className="height-sub">{h.sub}</span>
           </button>
         ))}
+      </div>
+      <div className="height-note">
+        Bauhöhe ohne Abdeckungen — zzgl. Abdeckungen ca. 4 cm
       </div>
     </Step>
   )

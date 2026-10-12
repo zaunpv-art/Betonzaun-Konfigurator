@@ -17,7 +17,8 @@ export function useHolzState() {
   const [torSize,        setTorSize]        = useState(null)
   // Betonplatte (sockel) appearance
   const [farbe,          setFarbe]          = useState('Naturgrau')
-  const [seiten,         setSeiten]         = useState('beidseitig')
+  // Only beidseitig plates are offered
+  const seiten = 'beidseitig'
 
   // When height changes, reset betonPlatten and holzCm
   useEffect(() => {
@@ -70,6 +71,5 @@ export function useHolzState() {
     setBeton,
     setTorSize,
     setFarbe,
-    setSeiten,
   }
 }

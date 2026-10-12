@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
 import TypeSwitcher from './components/TypeSwitcher.jsx'
 import BetonKonfigurator from './components/beton/BetonKonfigurator.jsx'
 import HolzKonfigurator from './components/holz/HolzKonfigurator.jsx'
@@ -60,6 +60,7 @@ export default function App() {
   const [activeType, setActiveType] = useState('beton')
   const betonState = useBetonState()
   const holzState  = useHolzState()
+  const layoutRef  = useRef(null)
 
   // ── Read initial hash on mount ──────────────────────────────────────────
   useEffect(() => {
@@ -123,7 +124,7 @@ export default function App() {
     <div className="app">
       <TypeSwitcher activeType={activeType} onChange={handleTypeChange} />
 
-      <div className="konfigurator-layout">
+      <div className="konfigurator-layout" ref={layoutRef}>
         {/* ── Left: sticky gallery ── */}
         <div className="gallery-col">
           <div className="gallery-sticky">
@@ -147,6 +148,7 @@ export default function App() {
             activeType={activeType}
             betonState={betonState}
             holzState={holzState}
+            anchorRef={layoutRef}
           />
         </div>
       </div>

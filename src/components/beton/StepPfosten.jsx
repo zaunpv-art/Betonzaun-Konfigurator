@@ -13,7 +13,7 @@ export default function StepPfosten({ state }) {
   } = state
 
   return (
-    <Step num="06" title="Pfosten" sub="Eck- und Endpfosten für Ihr Projekt">
+    <Step num="05" title="Pfosten" sub="Eck- und Endpfosten für Ihr Projekt">
       <div className="label-row">
         <span className="field-label">Pfosten Farbe</span>
         <span className="field-val">{postenFarbe}</span>

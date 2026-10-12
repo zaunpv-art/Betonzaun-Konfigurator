@@ -6,7 +6,6 @@ export function useBetonState() {
   const [motif,          setMotif]          = useState('Fels')
   const [plateHeight,    setPlateHeight]    = useState('26')
   const [buildHeight,    setBuildHeight]    = useState('182')
-  const [seiten,         setSeiten]         = useState('beidseitig')
   const [farbe,          setFarbe]          = useState('Naturgrau')
   const [laenge,         setLaenge]         = useState(10)
   const [postenFarbe,    setPostenFarbe]    = useState('Naturgrau')
@@ -25,11 +24,12 @@ export function useBetonState() {
 
   // ── Derived availability ─────────────────────────────────────────────────
 
+  // Only beidseitig plates are offered
+  const seiten = 'beidseitig'
+
   const availableMotifs = MOTIFS_BY_PLATE[plateHeight] || []
 
   const motifAvail = AVAILABILITY[plateHeight]?.[motif] || null
-
-  const canEinseitig = !!(motifAvail?.einseitig?.length > 0)
 
   const allowedColors = motifAvail?.[seiten] || []
 
@@ -50,19 +50,12 @@ export function useBetonState() {
     }
   }, [plateHeight])
 
-  // If seiten becomes unavailable, fall back to beidseitig
-  useEffect(() => {
-    if (seiten === 'einseitig' && !canEinseitig) {
-      setSeiten('beidseitig')
-    }
-  }, [motif, plateHeight])
-
   // If current farbe is not in allowedColors, reset to first allowed
   useEffect(() => {
     if (allowedColors.length > 0 && !allowedColors.includes(farbe)) {
       setFarbe(allowedColors[0])
     }
-  }, [motif, plateHeight, seiten])
+  }, [motif, plateHeight])
 
   // Auto-select and lock Beton when montage = profi or hilfe
   useEffect(() => {
@@ -76,11 +69,6 @@ export function useBetonState() {
 
   function handleSetPlateHeight(val) {
     setPlateHeight(val)
-  }
-
-  function handleSetSeiten(val) {
-    if (val === 'einseitig' && !canEinseitig) return
-    setSeiten(val)
   }
 
   function handleSetFarbe(val) {
@@ -104,12 +92,11 @@ export function useBetonState() {
     montage, beton, betonLocked, torSize, brilluxColor,
     torFarbe, kabelkanal,
     // derived
-    availableMotifs, canEinseitig, allowedColors,
+    availableMotifs, allowedColors,
     // setters
     setMotif,
     setPlateHeight: handleSetPlateHeight,
     setBuildHeight,
-    setSeiten: handleSetSeiten,
     setFarbe: handleSetFarbe,
     setLaenge,
     setPostenFarbe,

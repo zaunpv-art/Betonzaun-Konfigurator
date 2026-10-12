@@ -1,14 +1,23 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { buildBetonLineItems } from '../utils/cart.js'
 import { buildHolzLineItems }  from '../utils/cart.js'
 import { addToShopifyCart }    from '../utils/cart.js'
 import { useShopifyPrices, calcTotal } from '../hooks/useShopifyPrice.js'
 
-export default function PriceBar({ activeType, betonState, holzState }) {
+const fmt = n => n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'
+
+/**
+ * Compact one-row price bar: total on the left, CTA on the right.
+ * The breakdown opens as a sheet above the bar instead of growing the bar.
+ * The bar is only shown while `anchorRef` (the configurator layout) is on screen,
+ * so it never covers the theme footer or other page sections.
+ */
+export default function PriceBar({ activeType, betonState, holzState, anchorRef }) {
   const [expanded,  setExpanded]  = useState(false)
   const [adding,    setAdding]    = useState(false)
   const [cartError, setCartError] = useState(null)
+  const [inView,    setInView]    = useState(true)
 
   const { priceFn, loading } = useShopifyPrices()
 
@@ -22,6 +31,22 @@ export default function PriceBar({ activeType, betonState, holzState }) {
 
   const total    = calcTotal(items, priceFn)
   const hasTotal = items.some(i => i.fixedPrice != null || priceFn(i.variantId) != null)
+
+  // Show the bar only while the configurator is visible
+  useEffect(() => {
+    const el = anchorRef?.current
+    if (!el || typeof IntersectionObserver === 'undefined') return
+    const obs = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      { rootMargin: '0px 0px -120px 0px' },
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [anchorRef])
+
+  useEffect(() => {
+    if (!inView) setExpanded(false)
+  }, [inView])
 
   async function handleAddToCart() {
     if (shopifyItems.length === 0) {
@@ -37,7 +62,7 @@ export default function PriceBar({ activeType, betonState, holzState }) {
       properties['Brillux Farbnummer'] = betonState.brilluxColor.trim()
     }
     fixedItems.forEach(i => {
-      properties[i.label] = `${(i.fixedPrice * i.qty).toLocaleString('de-DE', { minimumFractionDigits: 2 })} €`
+      properties[i.label] = fmt(i.fixedPrice * i.qty)
     })
 
     try {
@@ -51,62 +76,61 @@ export default function PriceBar({ activeType, betonState, holzState }) {
 
   const priceDisplay = loading
     ? 'Laden…'
-    : hasTotal
-      ? total.toLocaleString('de-DE', { minimumFractionDigits: 2 }) + ' €'
-      : '— €'
+    : hasTotal ? fmt(total) : '— €'
 
   return createPortal(
-    <div className="price-bar">
-      <div className="price-bar-inner">
+    <>
+      {expanded && <div className="price-sheet-backdrop" onClick={() => setExpanded(false)} />}
 
-        {/* Expandable breakdown */}
-        <div className={`price-breakdown ${expanded ? 'expanded' : ''}`}>
-          {items.map((item, i) => {
-            const linePrice = item.fixedPrice != null
-              ? item.fixedPrice * item.qty
-              : priceFn(item.variantId) != null
-                ? priceFn(item.variantId) * item.qty
-                : null
-            return (
-              <div key={i} className="price-line">
-                <span>{item.label} × {item.qty}</span>
-                <span>
-                  {linePrice != null
-                    ? linePrice.toLocaleString('de-DE', { minimumFractionDigits: 2 }) + ' €'
-                    : loading ? '…' : '—'}
-                </span>
-              </div>
-            )
-          })}
+      <div className={`price-bar ${inView ? '' : 'price-bar-hidden'}`}>
+        {/* Breakdown sheet — slides up above the bar */}
+        <div className={`price-sheet ${expanded ? 'open' : ''}`} aria-hidden={!expanded}>
+          <div className="price-sheet-head">
+            <span>Ihre Konfiguration</span>
+            <button className="price-sheet-close" onClick={() => setExpanded(false)} aria-label="Schließen">×</button>
+          </div>
+          <div className="price-sheet-list">
+            {items.map((item, i) => {
+              const linePrice = item.fixedPrice != null
+                ? item.fixedPrice * item.qty
+                : priceFn(item.variantId) != null
+                  ? priceFn(item.variantId) * item.qty
+                  : null
+              return (
+                <div key={i} className="price-line">
+                  <span className="price-line-label">{item.label} <span className="price-line-qty">× {item.qty}</span></span>
+                  <span className="price-line-val">
+                    {linePrice != null ? fmt(linePrice) : loading ? '…' : '—'}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
         </div>
 
-        {/* Total row */}
-        <div className="price-total-row" onClick={() => setExpanded(e => !e)} style={{ cursor: 'pointer' }}>
-          <div>
-            <div className="price-label">
-              Geschätzter Gesamtpreis {items.length > 0 && (
-                <span style={{ fontSize: '.65rem', color: 'var(--gray-400)' }}>{expanded ? '▲' : '▼'}</span>
-              )}
-            </div>
-            <div className="price-note">inkl. MwSt., zzgl. Lieferung</div>
-          </div>
-          <div className="price-amount">{priceDisplay}</div>
+        <div className="price-bar-inner">
+          <button
+            className="price-summary"
+            onClick={() => setExpanded(e => !e)}
+            disabled={items.length === 0}
+            aria-expanded={expanded}
+          >
+            <span className="price-amount">{priceDisplay}</span>
+            <span className="price-note">
+              inkl. MwSt., zzgl. Lieferung
+              {items.length > 0 && <span className="price-details-link"> · Details {expanded ? '▾' : '▴'}</span>}
+            </span>
+          </button>
+
+          <button className="cta-btn" onClick={handleAddToCart} disabled={adding}>
+            <span>{adding ? 'Wird hinzugefügt…' : 'In den Warenkorb'}</span>
+            {!adding && <span className="cta-arrow">→</span>}
+          </button>
         </div>
 
-        {cartError && (
-          <div style={{ fontSize: '.75rem', color: '#dc2626', textAlign: 'center' }}>
-            {cartError}
-          </div>
-        )}
-
-        <button className="cta-btn" onClick={handleAddToCart} disabled={adding}>
-          <span>{adding ? 'Wird hinzugefügt…' : 'In den Warenkorb'}</span>
-          {!adding && <span className="cta-arrow">→</span>}
-        </button>
-
-        <div className="price-disclaimer">* Preise inkl. MwSt.</div>
+        {cartError && <div className="price-error">{cartError}</div>}
       </div>
-    </div>,
+    </>,
     document.body
   )
 }

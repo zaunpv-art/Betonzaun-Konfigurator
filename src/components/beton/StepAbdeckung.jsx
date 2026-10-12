@@ -21,7 +21,7 @@ export default function StepAbdeckung({ state }) {
   const pfosten  = calcPfosten(sections, eckpfosten, endpfosten)
 
   return (
-    <Step num="08" title={<>Abdeckungen <span className="optional-badge">Optional</span></>} sub="Pfosten-Abdeckungen (Eck-, End- & Zwischenkappen)">
+    <Step num="07" title={<>Abdeckungen <span className="optional-badge">Optional</span></>} sub="Pfosten-Abdeckungen (Eck-, End- & Zwischenkappen)">
       <TogglePills options={OPTIONS} activeId={abdeckung} onSelect={setAbdeckung} />
 
       {abdeckung !== 'none' && (

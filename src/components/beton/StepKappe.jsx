@@ -14,7 +14,7 @@ export default function StepKappe({ state }) {
   const { kappe, kappeFarbe, setKappe, setKappeFarbe } = state
 
   return (
-    <Step num="07" title={<>Pfostenkappen <span className="optional-badge">Optional</span></>} sub="Abschluss für jeden Pfosten">
+    <Step num="06" title={<>Pfostenkappen <span className="optional-badge">Optional</span></>} sub="Abschluss für jeden Pfosten">
       <TogglePills options={KAPPE_OPTIONS} activeId={kappe} onSelect={setKappe} />
 
       {kappe !== 'none' && (

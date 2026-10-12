@@ -23,7 +23,7 @@ const OPTIONS = [
   },
 ]
 
-export default function StepMontage({ state, stepNum = '09' }) {
+export default function StepMontage({ state, stepNum = '08' }) {
   const { montage, setMontage } = state
   const activeOption = OPTIONS.find(o => o.id === montage)
 

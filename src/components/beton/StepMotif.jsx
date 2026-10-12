@@ -1,6 +1,7 @@
 import React from 'react'
 import Step from '../shared/Step.jsx'
 import MotifGrid from '../shared/MotifGrid.jsx'
+import BeidseitigNote from '../shared/BeidseitigNote.jsx'
 import { BETON_MOTIFS, MOTIFS_BY_PLATE } from '../../data/betonData.js'
 
 export default function StepMotif({ state }) {
@@ -19,6 +20,7 @@ export default function StepMotif({ state }) {
         farbe={farbe}
         seiten={seiten}
       />
+      <BeidseitigNote />
     </Step>
   )
 }
