@@ -1,5 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react'
-import { createPortal } from 'react-dom'
+import React, { useState, useMemo } from 'react'
 import { buildBetonLineItems } from '../utils/cart.js'
 import { buildHolzLineItems }  from '../utils/cart.js'
 import { addToShopifyCart }    from '../utils/cart.js'
@@ -10,14 +9,14 @@ const fmt = n => n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFr
 /**
  * Compact one-row price bar: total on the left, CTA on the right.
  * The breakdown opens as a sheet above the bar instead of growing the bar.
- * The bar is only shown while `anchorRef` (the configurator layout) is on screen,
- * so it never covers the theme footer or other page sections.
+ * Rendered as the last child of .app with position: sticky, so it follows the
+ * viewport while the configurator is on screen and rests at the end of the
+ * section — the theme footer comes after it instead of underneath it.
  */
-export default function PriceBar({ activeType, betonState, holzState, anchorRef }) {
+export default function PriceBar({ activeType, betonState, holzState }) {
   const [expanded,  setExpanded]  = useState(false)
   const [adding,    setAdding]    = useState(false)
   const [cartError, setCartError] = useState(null)
-  const [inView,    setInView]    = useState(true)
 
   const { priceFn, loading } = useShopifyPrices()
 
@@ -31,22 +30,6 @@ export default function PriceBar({ activeType, betonState, holzState, anchorRef 
 
   const total    = calcTotal(items, priceFn)
   const hasTotal = items.some(i => i.fixedPrice != null || priceFn(i.variantId) != null)
-
-  // Show the bar only while the configurator is visible
-  useEffect(() => {
-    const el = anchorRef?.current
-    if (!el || typeof IntersectionObserver === 'undefined') return
-    const obs = new IntersectionObserver(
-      ([entry]) => setInView(entry.isIntersecting),
-      { rootMargin: '0px 0px -120px 0px' },
-    )
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [anchorRef])
-
-  useEffect(() => {
-    if (!inView) setExpanded(false)
-  }, [inView])
 
   async function handleAddToCart() {
     if (shopifyItems.length === 0) {
@@ -78,11 +61,11 @@ export default function PriceBar({ activeType, betonState, holzState, anchorRef 
     ? 'Laden…'
     : hasTotal ? fmt(total) : '— €'
 
-  return createPortal(
+  return (
     <>
       {expanded && <div className="price-sheet-backdrop" onClick={() => setExpanded(false)} />}
 
-      <div className={`price-bar ${inView ? '' : 'price-bar-hidden'}`}>
+      <div className="price-bar">
         {/* Breakdown sheet — slides up above the bar */}
         <div className={`price-sheet ${expanded ? 'open' : ''}`} aria-hidden={!expanded}>
           <div className="price-sheet-head">
@@ -130,7 +113,6 @@ export default function PriceBar({ activeType, betonState, holzState, anchorRef 
 
         {cartError && <div className="price-error">{cartError}</div>}
       </div>
-    </>,
-    document.body
+    </>
   )
 }

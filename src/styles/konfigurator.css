@@ -706,25 +706,18 @@ input:checked + .slider::before { transform: translateX(18px); }
 .material-card.active .material-name { color: var(--fuchsia); }
 
 /* ─── PRICE BAR ─── */
-/* Compact one-row bar fixed to the bottom of the viewport. Hidden (slid away)
-   once the configurator scrolls out of view — see PriceBar.jsx */
+/* Compact one-row bar, last child of .app. Sticky: follows the viewport bottom
+   while the configurator is on screen, then rests at the end of the section so
+   the theme footer comes after it — see PriceBar.jsx */
 .price-bar {
-  position: fixed;
+  position: sticky;
   bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 99999; /* above theme footer */
+  z-index: 300;
   background: rgba(255,255,255,.97);
   backdrop-filter: blur(16px);
   border-top: 1px solid var(--border);
   box-shadow: 0 -4px 20px rgba(0,0,0,.08);
   padding: .6rem 1.5rem calc(.6rem + env(safe-area-inset-bottom));
-  transition: transform .3s ease;
-}
-
-.price-bar-hidden {
-  transform: translateY(110%);
-  pointer-events: none;
 }
 
 .price-bar-inner {
@@ -894,12 +887,11 @@ input:checked + .slider::before { transform: translateX(18px); }
 .price-sheet-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 99998;
+  z-index: 299;
   background: rgba(15,23,42,.25);
 }
 
-/* Room for the fixed bar so the last step is never hidden behind it */
-.konfigurator-col { padding-bottom: 5.5rem; }
+.konfigurator-col { padding-bottom: 1.5rem; }
 
 
 /* ═══════════════════════════════════════════════
