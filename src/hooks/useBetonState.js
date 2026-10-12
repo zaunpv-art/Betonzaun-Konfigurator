@@ -1,0 +1,129 @@
+import { useState, useEffect } from 'react'
+import { AVAILABILITY, MOTIFS_BY_PLATE, BUILD_HEIGHTS } from '../data/betonData.js'
+import { normaliseEndpfosten } from '../utils/calculations.js'
+
+export function useBetonState() {
+  const [motif,          setMotif]          = useState('Fels')
+  const [plateHeight,    setPlateHeight]    = useState('26')
+  const [buildHeight,    setBuildHeight]    = useState('182')
+  const [seiten,         setSeiten]         = useState('beidseitig')
+  const [farbe,          setFarbe]          = useState('Naturgrau')
+  const [laenge,         setLaenge]         = useState(10)
+  const [postenFarbe,    setPostenFarbe]    = useState('Naturgrau')
+  const [eckpfosten,     setEckpfosten]     = useState(0)
+  const [endpfosten,     setEndpfosten]     = useState(2)
+  const [kappe,          setKappe]          = useState('none')
+  const [kappeFarbe,     setKappeFarbe]     = useState('Naturgrau')
+  const [abdeckung,      setAbdeckung]      = useState('none')
+  const [abdeckungFarbe, setAbdeckungFarbe] = useState('Naturgrau')
+  const [montage,        setMontage]        = useState('profi')
+  const [beton,          setBeton]          = useState(true)
+  const [torSize,        setTorSize]        = useState(null)
+  const [brilluxColor,   setBrilluxColor]   = useState('')
+  const [kabelkanal,     setKabelkanal]     = useState(0)
+  const [torFarbe,       setTorFarbe]       = useState('Naturgrau')
+
+  // ── Derived availability ─────────────────────────────────────────────────
+
+  const availableMotifs = MOTIFS_BY_PLATE[plateHeight] || []
+
+  const motifAvail = AVAILABILITY[plateHeight]?.[motif] || null
+
+  const canEinseitig = !!(motifAvail?.einseitig?.length > 0)
+
+  const allowedColors = motifAvail?.[seiten] || []
+
+  // ── Side effects: enforce constraints when upstream selections change ─────
+
+  // If motif becomes unavailable for new plate height, reset to first available
+  useEffect(() => {
+    if (!availableMotifs.includes(motif)) {
+      setMotif(availableMotifs[0])
+    }
+  }, [plateHeight])
+
+  // If plate height changes, reset build height to first option
+  useEffect(() => {
+    const heights = BUILD_HEIGHTS[plateHeight]
+    if (heights && !heights.find(h => h.cm === buildHeight)) {
+      setBuildHeight(heights[0].cm)
+    }
+  }, [plateHeight])
+
+  // If seiten becomes unavailable, fall back to beidseitig
+  useEffect(() => {
+    if (seiten === 'einseitig' && !canEinseitig) {
+      setSeiten('beidseitig')
+    }
+  }, [motif, plateHeight])
+
+  // If current farbe is not in allowedColors, reset to first allowed
+  useEffect(() => {
+    if (allowedColors.length > 0 && !allowedColors.includes(farbe)) {
+      setFarbe(allowedColors[0])
+    }
+  }, [motif, plateHeight, seiten])
+
+  // Auto-select and lock Beton when montage = profi or hilfe
+  useEffect(() => {
+    if (montage === 'profi' || montage === 'hilfe') setBeton(true)
+  }, [montage])
+
+  // Derived: beton cannot be toggled off when professional montage is selected
+  const betonLocked = montage === 'profi' || montage === 'hilfe'
+
+  // ── Helpers ──────────────────────────────────────────────────────────────
+
+  function handleSetPlateHeight(val) {
+    setPlateHeight(val)
+  }
+
+  function handleSetSeiten(val) {
+    if (val === 'einseitig' && !canEinseitig) return
+    setSeiten(val)
+  }
+
+  function handleSetFarbe(val) {
+    if (!allowedColors.includes(val)) return
+    setFarbe(val)
+  }
+
+  function handleSetEndpfosten(val, dir = 1) {
+    setEndpfosten(normaliseEndpfosten(val, dir))
+  }
+
+  function handleSetEckpfosten(val) {
+    setEckpfosten(Math.max(0, val))
+  }
+
+  return {
+    // state
+    motif, plateHeight, buildHeight, seiten, farbe,
+    laenge, postenFarbe, eckpfosten, endpfosten,
+    kappe, kappeFarbe, abdeckung, abdeckungFarbe,
+    montage, beton, betonLocked, torSize, brilluxColor,
+    torFarbe, kabelkanal,
+    // derived
+    availableMotifs, canEinseitig, allowedColors,
+    // setters
+    setMotif,
+    setPlateHeight: handleSetPlateHeight,
+    setBuildHeight,
+    setSeiten: handleSetSeiten,
+    setFarbe: handleSetFarbe,
+    setLaenge,
+    setPostenFarbe,
+    setEckpfosten: handleSetEckpfosten,
+    setEndpfosten: handleSetEndpfosten,
+    setKappe,
+    setKappeFarbe,
+    setAbdeckung,
+    setAbdeckungFarbe,
+    setMontage,
+    setBeton,
+    setTorSize,
+    setBrilluxColor,
+    torFarbe, setTorFarbe,
+    kabelkanal, setKabelkanal,
+  }
+}
