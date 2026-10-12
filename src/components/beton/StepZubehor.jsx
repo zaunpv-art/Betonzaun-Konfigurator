@@ -101,13 +101,19 @@ export default function StepZubehor({ state, stepNum = '09' }) {
         )}
         {brilluxColor !== '' && (
           <input
-            className="text-input"
+            id="brillux-color-input"
+            className={`text-input ${brilluxColor.trim() ? '' : 'text-input-warn'}`}
             style={{ marginTop: '.7rem' }}
             type="text"
             placeholder="Farbnummer eingeben (z.B. 3040)"
             value={brilluxColor.trim()}
-            onChange={e => setBrilluxColor(e.target.value)}
+            onChange={e => setBrilluxColor(e.target.value || ' ')}
           />
+        )}
+        {brilluxColor !== '' && !brilluxColor.trim() && (
+          <div className="info-note visible" style={{ marginTop: '.5rem' }}>
+            Bitte Brillux Farbnummer eingeben — ohne Farbnummer wird keine Farbe in den Warenkorb gelegt.
+          </div>
         )}
       </div>
 

@@ -3,7 +3,7 @@ import Step from '../shared/Step.jsx'
 import TogglePills from '../shared/TogglePills.jsx'
 import ColorPills from '../shared/ColorPills.jsx'
 import { COLORS } from '../../data/betonData.js'
-import { calcSections, calcPfosten } from '../../utils/calculations.js'
+import { calcSections } from '../../utils/calculations.js'
 
 const OPTIONS = [
   { id: 'none',    label: 'Keine' },
@@ -13,15 +13,14 @@ const OPTIONS = [
 
 export default function StepAbdeckung({ state }) {
   const {
-    abdeckung, abdeckungFarbe, laenge, eckpfosten, endpfosten,
+    abdeckung, abdeckungFarbe, laenge,
     setAbdeckung, setAbdeckungFarbe,
   } = state
 
   const sections = calcSections(laenge)
-  const pfosten  = calcPfosten(sections, eckpfosten, endpfosten)
 
   return (
-    <Step num="07" title={<>Abdeckungen <span className="optional-badge">Optional</span></>} sub="Pfosten-Abdeckungen (Eck-, End- & Zwischenkappen)">
+    <Step num="07" title={<>Abdeckungen <span className="optional-badge">Optional</span></>} sub="Abdeckung oben auf jedem Zaunfeld">
       <TogglePills options={OPTIONS} activeId={abdeckung} onSelect={setAbdeckung} />
 
       {abdeckung !== 'none' && (
@@ -34,7 +33,10 @@ export default function StepAbdeckung({ state }) {
             <ColorPills colors={COLORS} activeId={abdeckungFarbe} onSelect={setAbdeckungFarbe} />
           </div>
           <div className="calc-note" style={{ marginTop: '.6rem' }}>
-            → {sections} Abdeckung(en) · Eckkappen: {pfosten.eck} · Endkappen: {pfosten.end} · Zwischenkappen: {pfosten.zwischen}
+            → {sections} Abdeckung(en) · 1 pro Zaunfeld
+          </div>
+          <div className="info-note visible" style={{ marginTop: '.5rem' }}>
+            Pfostenkappen sind nicht enthalten — bei Bedarf in Schritt 06 wählen.
           </div>
         </>
       )}

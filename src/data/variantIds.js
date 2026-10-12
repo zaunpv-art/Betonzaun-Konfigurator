@@ -295,3 +295,13 @@ export const KABELKANAL_VARIANTS = {
   '234': { Naturgrau: '57913289670920', Anthrazit: '57913289703688', Schwarz: '57913289736456' },
   '252': { Naturgrau: '57913289769224', Anthrazit: '57913289801992', Schwarz: '57913289834760' },
 }
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+
+/** True if at least one plate variant exists for this plate height + motif. */
+export function hasPlateVariant(plateHeight, motif) {
+  const bySeiten = PLATE_VARIANTS[plateHeight]?.[motif]
+  return !!bySeiten && Object.values(bySeiten).some(byFarbe =>
+    Object.values(byFarbe).some(id => !!id)
+  )
+}

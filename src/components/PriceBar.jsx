@@ -74,9 +74,23 @@ export default function PriceBar({ activeType, betonState, holzState }) {
     if (mode === 'hidden') setExpanded(false)
   }, [mode])
 
+  // Clear a previous error once the configuration changes
+  useEffect(() => {
+    setCartError(null)
+  }, [items])
+
   async function handleAddToCart() {
     if (shopifyItems.length === 0) {
       alert('Bitte treffen Sie zuerst Ihre Auswahl.')
+      return
+    }
+
+    // Brillux switched on but no colour number entered
+    if (activeType === 'beton' && betonState.brilluxColor !== '' && !betonState.brilluxColor?.trim()) {
+      setCartError('Bitte geben Sie eine Brillux Farbnummer ein oder deaktivieren Sie „Farbe Brillux“.')
+      const input = document.getElementById('brillux-color-input')
+      input?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      input?.focus({ preventScroll: true })
       return
     }
 

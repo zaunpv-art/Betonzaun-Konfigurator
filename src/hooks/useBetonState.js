@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { AVAILABILITY, MOTIFS_BY_PLATE, BUILD_HEIGHTS } from '../data/betonData.js'
 import { normaliseEndpfosten } from '../utils/calculations.js'
+import { hasPlateVariant } from '../data/variantIds.js'
 
 export function useBetonState() {
   const [motif,          setMotif]          = useState('Fels')
@@ -27,7 +28,9 @@ export function useBetonState() {
   // Only beidseitig plates are offered
   const seiten = 'beidseitig'
 
-  const availableMotifs = MOTIFS_BY_PLATE[plateHeight] || []
+  // Motifs offered for this plate height that also exist in Shopify
+  const availableMotifs = (MOTIFS_BY_PLATE[plateHeight] || [])
+    .filter(m => hasPlateVariant(plateHeight, m))
 
   const motifAvail = AVAILABILITY[plateHeight]?.[motif] || null
 
@@ -41,6 +44,16 @@ export function useBetonState() {
       setMotif(availableMotifs[0])
     }
   }, [plateHeight])
+
+  // If a motif is set that only exists in the other plate height (e.g. from a
+  // #betonzaun/Mosaik link), switch the plate height instead of the motif
+  useEffect(() => {
+    if (availableMotifs.includes(motif)) return
+    const other = plateHeight === '26' ? '36' : '26'
+    if (MOTIFS_BY_PLATE[other]?.includes(motif) && hasPlateVariant(other, motif)) {
+      setPlateHeight(other)
+    }
+  }, [motif])
 
   // If plate height changes, reset build height to first option
   useEffect(() => {

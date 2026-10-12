@@ -5,6 +5,11 @@ import ColorPills from '../shared/ColorPills.jsx'
 import BeidseitigNote from '../shared/BeidseitigNote.jsx'
 import { HOLZ_MOTIFS } from '../../data/holzData.js'
 import { COLORS } from '../../data/betonData.js'
+import { hasPlateVariant } from '../../data/variantIds.js'
+
+// Sockel is always a 26 cm plate — grey out motifs not yet in Shopify
+const DISABLED = HOLZ_MOTIFS.map(m => m.id).filter(id => !hasPlateVariant('26', id))
+const HINTS    = Object.fromEntries(DISABLED.map(id => [id, 'bald verfügbar']))
 
 export default function HolzStepMotif({ state }) {
   const { motif, farbe, seiten, setMotif, setFarbe } = state
@@ -14,6 +19,8 @@ export default function HolzStepMotif({ state }) {
       <MotifGrid
         motifs={HOLZ_MOTIFS}
         activeId={motif}
+        disabledIds={DISABLED}
+        hints={HINTS}
         onSelect={setMotif}
         plateHeight="26"
         farbe={farbe}

@@ -6,6 +6,7 @@ import { MOTIF_IMAGES } from '../../data/motifImages.js'
  *   motifs       - [{ id, label, swatch }]
  *   activeId     - selected motif id
  *   disabledIds  - grayed out motif ids
+ *   hints        - { motifId: text } small badge shown on disabled motifs
  *   onSelect     - callback(motifId)
  *   plateHeight  - '26' | '36' (unused for images now, kept for API compat)
  *   farbe        - kept for API compat
@@ -15,6 +16,7 @@ export default function MotifGrid({
   motifs,
   activeId,
   disabledIds = [],
+  hints = {},
   onSelect,
 }) {
   return (
@@ -25,6 +27,7 @@ export default function MotifGrid({
           motif={m}
           active={activeId === m.id}
           disabled={disabledIds.includes(m.id)}
+          hint={disabledIds.includes(m.id) ? hints[m.id] : null}
           onSelect={onSelect}
         />
       ))}
@@ -32,7 +35,7 @@ export default function MotifGrid({
   )
 }
 
-function MotifBtn({ motif, active, disabled, onSelect }) {
+function MotifBtn({ motif, active, disabled, hint, onSelect }) {
   const [imgError, setImgError] = useState(false)
   const imgUrl = MOTIF_IMAGES[motif.id]
 
@@ -45,6 +48,7 @@ function MotifBtn({ motif, active, disabled, onSelect }) {
       ].join(' ')}
       onClick={() => !disabled && onSelect(motif.id)}
       disabled={disabled}
+      title={hint || undefined}
     >
       {imgUrl && !imgError ? (
         <img
@@ -57,6 +61,7 @@ function MotifBtn({ motif, active, disabled, onSelect }) {
       ) : (
         <div className={`motif-swatch ${motif.swatch}`} />
       )}
+      {hint && <div className="motif-hint">{hint}</div>}
       <div className="motif-name-label">{motif.label}</div>
     </button>
   )

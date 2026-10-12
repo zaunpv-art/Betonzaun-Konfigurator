@@ -233,9 +233,29 @@ h1,h2,h3,h4,.logo { font-family: 'Ubuntu', sans-serif; }
 }
 
 .motif-btn.disabled {
-  opacity: 0.35;
-  pointer-events: none;
+  opacity: 0.45;
+  cursor: not-allowed;
   filter: grayscale(1);
+}
+
+.motif-btn.disabled:hover {
+  transform: none;
+  border-color: var(--border);
+  box-shadow: none;
+}
+
+.motif-hint {
+  position: absolute;
+  top: 38%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(17,24,39,.85);
+  color: var(--white);
+  font-size: .58rem;
+  font-weight: 700;
+  padding: .15rem .45rem;
+  border-radius: 1rem;
+  white-space: nowrap;
 }
 
 .motif-swatch {
@@ -664,6 +684,7 @@ input:checked + .slider::before { transform: translateX(18px); }
 }
 
 .text-input:focus { border-color: var(--blue); }
+.text-input-warn { border-color: #f97316; }
 .text-input::placeholder { color: var(--gray-400); }
 
 /* ─── MATERIAL CARDS (Holz) ─── */
