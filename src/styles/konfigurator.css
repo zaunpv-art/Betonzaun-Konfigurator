@@ -1545,8 +1545,12 @@ input:checked + .slider::before { transform: translateX(18px); }
 .montage-details p + p { margin-top: .4rem; }
 .montage-disclaimer { color: #9a3412; }
 
-/* ─── ZWISCHENPFOSTEN COUNTER (full width, above Eck/End) ─── */
-.counter-zwischen .counter-item { max-width: calc(50% - .375rem); }
+/* ─── PFOSTEN COUNTERS ─── */
+/* Keep the input boxes aligned when one label wraps onto two lines */
+.counter-cell { display: flex; flex-direction: column; }
+.counter-cell .counter-item { flex: 1; }
+.counter-item .counter-wrap { margin-top: auto; }
+.counter-label { hyphens: manual; }
 
 .counter-reset {
   margin-top: .35rem;
@@ -1561,7 +1565,3 @@ input:checked + .slider::before { transform: translateX(18px); }
 }
 
 .counter-reset:hover { text-decoration: underline; }
-
-@media (max-width: 600px) {
-  .counter-zwischen .counter-item { max-width: calc(50% - .25rem); }
-}

@@ -56,7 +56,7 @@ export const INFO = {
     title: 'Zwischenpfosten',
     text: [
       'Vorausgewählt: Anzahl Zaunfelder + 1 (bei 6 Feldern also 7 Zwischenpfosten).',
-      'Eck- und Endpfosten ersetzen Zwischenpfosten – die Anzahl passt sich automatisch an. Sie können den Wert jederzeit selbst ändern.',
+      'Eck- und Endpfosten ersetzen Zwischenpfosten. Sie können den Wert jederzeit selbst ändern.',
     ],
   },
 
@@ -75,7 +75,11 @@ export const INFO = {
   },
 
   kabelkanal: {
-    text: 'Zwischenpfosten mit integriertem Kabelkanal für Strom- oder Datenleitungen, z. B. für eine Zaunbeleuchtung.',
+    title: 'Kabelkanalzwischenpfosten',
+    text: [
+      'Spezialpfosten mit integriertem Kabelkanal — ideal für Beleuchtung entlang des Zauns.',
+      'Wählen Sie, wie viele dieser Pfosten Sie in Ihrem Projekt benötigen. Sie ersetzen entsprechende Zwischenpfosten.',
+    ],
   },
 
   kappen: {
