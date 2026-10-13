@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { normaliseEndpfosten } from '../utils/calculations.js'
+import { calcSections, calcPfosten } from '../utils/calculations.js'
 
 export function useHolzState() {
   const [motif,          setMotif]          = useState(null)  // no preselection
@@ -11,7 +11,8 @@ export function useHolzState() {
   const [laenge,         setLaenge]         = useState(10)
   const [postenFarbe,    setPostenFarbe]    = useState('Naturgrau')
   const [eckpfosten,     setEckpfosten]     = useState(0)
-  const [endpfosten,     setEndpfosten]     = useState(2)
+  const [endpfosten,     setEndpfosten]     = useState(0)  // no preselection
+  const [zwischenDelta,  setZwischenDelta]  = useState(0)
   const [montage,        setMontage]        = useState('profi')
   const [beton,          setBeton]          = useState(true)
   const [torSize,        setTorSize]        = useState(null)
@@ -45,17 +46,39 @@ export function useHolzState() {
 
   const betonLocked = montage === 'profi' || montage === 'hilfe'
 
-  function handleSetEndpfosten(val, dir = 1) {
-    setEndpfosten(normaliseEndpfosten(val, dir))
+  // ── Pfosten ──────────────────────────────────────────────────────────────
+  // Zwischenpfosten are suggested from the fence length (sections + 1) and
+  // adjusted by Eck-/Endpfosten; the customer can override the suggestion.
+  // A new length resets that override.
+  const pfosten = calcPfosten(calcSections(laenge), eckpfosten, endpfosten, zwischenDelta)
+
+  useEffect(() => {
+    setZwischenDelta(0)
+  }, [laenge])
+
+  function handleSetZwischenpfosten(val) {
+    setZwischenDelta(Math.max(0, val) - pfosten.autoZwischen)
+  }
+
+  function handleSetEndpfosten(val) {
+    setEndpfosten(Math.max(0, val))
   }
 
   function handleSetEckpfosten(val) {
     setEckpfosten(Math.max(0, val))
   }
 
+  // A gate needs an Endpfosten on each side of the opening
+  function handleSetTorSize(next) {
+    if (!torSize && next) setEndpfosten(e => e + 2)
+    if (torSize && !next) setEndpfosten(e => Math.max(0, e - 2))
+    setTorSize(next)
+  }
+
   return {
+    pfosten,
     motif, buildHeight, betonPlatten, holzCm, holzMaterial,
-    abdeckleistung, laenge, postenFarbe, eckpfosten, endpfosten,
+    abdeckleistung, laenge, postenFarbe, eckpfosten, endpfosten, zwischenDelta,
     montage, beton, betonLocked, torSize,
     farbe, seiten,
     setMotif,
@@ -67,9 +90,10 @@ export function useHolzState() {
     setPostenFarbe,
     setEckpfosten: handleSetEckpfosten,
     setEndpfosten: handleSetEndpfosten,
+    setZwischenpfosten: handleSetZwischenpfosten,
     setMontage,
     setBeton,
-    setTorSize,
+    setTorSize: handleSetTorSize,
     setFarbe,
   }
 }

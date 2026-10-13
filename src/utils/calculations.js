@@ -13,34 +13,20 @@ export function calcSections(laengeM) {
  * Calculate pfosten distribution.
  *
  * Rules:
- * - zwischenpfosten = sections - 1
- * - subtract eckpfosten from zwischenpfosten
- * - for every 2 extra endpfosten above 2, subtract 1 zwischenpfosten
+ * - suggested zwischenpfosten = sections + 1
+ * - each eckpfosten replaces 1 zwischenpfosten
+ * - every 2 endpfosten replace 1 zwischenpfosten (1 → 0, 2 → 1, 3 → 1, 4 → 2 …)
+ * - zwischenDelta: the customer's manual adjustment on top of the suggestion
  * - zwischenpfosten never goes below 0
  */
-export function calcPfosten(sections, eckpfosten, endpfosten) {
-  let zwischen = sections - 1
-  zwischen = Math.max(0, zwischen - eckpfosten)
-  const extraEnd = Math.max(0, endpfosten - 2)
-  zwischen = Math.max(0, zwischen - Math.floor(extraEnd / 2))
+export function calcPfosten(sections, eckpfosten, endpfosten, zwischenDelta = 0) {
+  const autoZwischen = Math.max(0, sections + 1 - eckpfosten - Math.floor(endpfosten / 2))
+  const zwischen     = Math.max(0, autoZwischen + zwischenDelta)
   return {
     zwischen,
+    autoZwischen,
     eck: eckpfosten,
     end: endpfosten,
     total: zwischen + eckpfosten + endpfosten,
   }
-}
-
-/**
- * Enforce endpfosten rules:
- * - minimum 2
- * - if > 2 must be even
- */
-export function normaliseEndpfosten(val, direction = 1) {
-  let v = Math.max(2, val)
-  if (v > 2 && v % 2 !== 0) {
-    v = direction >= 0 ? v + 1 : v - 1
-    v = Math.max(2, v)
-  }
-  return v
 }

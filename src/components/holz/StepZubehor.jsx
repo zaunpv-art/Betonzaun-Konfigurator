@@ -1,14 +1,11 @@
 import React from 'react'
 import Step from '../shared/Step.jsx'
 import { HOLZ_BETON_BAGS_PER_PFOSTEN } from '../../data/holzData.js'
-import { calcSections, calcPfosten } from '../../utils/calculations.js'
 import { INFO } from '../../data/infoTexts.js'
 import InfoTip from '../shared/InfoTip.jsx'
 
 export default function HolzStepZubehor({ state }) {
-  const { beton, setBeton, betonLocked, laenge, eckpfosten, endpfosten } = state
-  const sections   = calcSections(laenge)
-  const pfosten    = calcPfosten(sections, eckpfosten, endpfosten)
+  const { beton, setBeton, betonLocked, pfosten } = state
   const totalBags  = HOLZ_BETON_BAGS_PER_PFOSTEN * pfosten.total
 
   return (

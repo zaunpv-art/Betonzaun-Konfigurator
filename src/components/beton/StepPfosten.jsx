@@ -2,20 +2,19 @@ import React from 'react'
 import Step from '../shared/Step.jsx'
 import ColorPills from '../shared/ColorPills.jsx'
 import Counter from '../shared/Counter.jsx'
+import PfostenCounters from '../shared/PfostenCounters.jsx'
 import { COLORS } from '../../data/betonData.js'
-import { calcSections, calcPfosten } from '../../utils/calculations.js'
 import { INFO } from '../../data/infoTexts.js'
 import InfoTip from '../shared/InfoTip.jsx'
 
 export default function StepPfosten({ state }) {
   const {
-    laenge, buildHeight, eckpfosten, endpfosten,
-    postenFarbe, setPostenFarbe, setEckpfosten, setEndpfosten,
+    postenFarbe, setPostenFarbe,
     kabelkanal, setKabelkanal,
   } = state
 
   return (
-    <Step num="05" title="Pfosten" info={INFO.pfosten} sub="Eck- und Endpfosten für Ihr Projekt">
+    <Step num="05" title="Pfosten" info={INFO.pfosten} sub="Zwischen-, Eck- und Endpfosten für Ihr Projekt">
       <div className="label-row">
         <span className="field-label">Pfosten Farbe</span>
         <span className="field-val">{postenFarbe}</span>
@@ -26,28 +25,8 @@ export default function StepPfosten({ state }) {
         onSelect={setPostenFarbe}
       />
 
-      <div className="counter-grid" style={{ marginTop: '1rem' }}>
-        <Counter
-          label="Eckpfosten"
-          info={INFO.eckpfosten}
-          sub="für 90°-Ecken"
-          value={eckpfosten}
-          min={0}
-          onChange={setEckpfosten}
-        />
-        <Counter
-          label="Endpfosten"
-          info={INFO.endpfosten}
-          sub="mind. 2 (immer gerade)"
-          value={endpfosten}
-          min={2}
-          isEnd
-          onChange={setEndpfosten}
-        />
-      </div>
-
-      <div className="info-note visible" style={{ marginTop: '.6rem' }}>
-        Wie viele Ecken hat Ihr Zaun? Geben Sie die Anzahl der Eckpfosten für 90°-Kurven an.
+      <div style={{ marginTop: '1rem' }}>
+        <PfostenCounters state={state} />
       </div>
 
       {/* Kabelkanalzwischenpfosten */}

@@ -4,7 +4,6 @@ import TogglePills from '../shared/TogglePills.jsx'
 import ColorPills from '../shared/ColorPills.jsx'
 import { BETON_BAGS } from '../../data/betonData.js'
 import { COLORS } from '../../data/betonData.js'
-import { calcSections, calcPfosten } from '../../utils/calculations.js'
 import { INFO } from '../../data/infoTexts.js'
 import InfoTip from '../shared/InfoTip.jsx'
 
@@ -14,11 +13,9 @@ export default function StepZubehor({ state, stepNum = '09' }) {
     torSize, setTorSize,
     torFarbe, setTorFarbe,
     brilluxColor, setBrilluxColor,
-    laenge, buildHeight, eckpfosten, endpfosten,
+    laenge, buildHeight, pfosten,
   } = state
 
-  const sections     = calcSections(laenge)
-  const pfosten      = calcPfosten(sections, eckpfosten, endpfosten)
   const bags         = BETON_BAGS[buildHeight] || 4
   const totalBags    = bags * pfosten.total
 

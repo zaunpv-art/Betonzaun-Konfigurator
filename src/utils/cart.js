@@ -66,7 +66,7 @@ function calcFarbeBuckets(laenge) {
 
 export function buildBetonLineItems(s) {
   const sections  = calcSections(s.laenge)
-  const pfosten   = calcPfosten(sections, s.eckpfosten, s.endpfosten)
+  const pfosten   = calcPfosten(sections, s.eckpfosten, s.endpfosten, s.zwischenDelta)
   const heightObj = BUILD_HEIGHTS[s.plateHeight]?.find(h => h.cm === s.buildHeight)
   const platesPerSection = heightObj?.plates || 0
   const plateCount = sections * platesPerSection
@@ -168,7 +168,7 @@ export function buildHolzLineItems(s) {
   if (!s.holzMaterial || !s.motif) return { items: [], sections: 0, pfosten: { zwischen: 0, eck: 0, end: 0, total: 0 } }
 
   const sections = calcSections(s.laenge)
-  const pfosten  = calcPfosten(sections, s.eckpfosten, s.endpfosten)
+  const pfosten  = calcPfosten(sections, s.eckpfosten, s.endpfosten, s.zwischenDelta)
 
   const items = []
 

@@ -47,19 +47,30 @@ export const INFO = {
   pfosten: {
     title: 'Welche Pfosten brauche ich?',
     text: [
-      'Zwischenpfosten stehen zwischen zwei Feldern und halten Platten auf beiden Seiten – sie werden automatisch berechnet.',
-      'Endpfosten schließen einen Zaunzug ab und haben nur auf einer Seite eine Nut. Eckpfosten verbinden zwei Zaunzüge im 90°-Winkel.',
+      'Zwischenpfosten stehen zwischen zwei Zaunfeldern und halten Platten auf beiden Seiten. Endpfosten schließen einen Zaunzug ab (z. B. am Zaunende oder neben einem Tor) und haben nur auf einer Seite eine Nut. Eckpfosten verbinden zwei Zaunzüge im 90°-Winkel.',
+      'Die Zwischenpfosten berechnen wir aus Ihrer Zaunlänge vor – Sie können alle Werte selbst anpassen.',
+    ],
+  },
+
+  zwischenpfosten: {
+    title: 'Zwischenpfosten',
+    text: [
+      'Vorausgewählt: Anzahl Zaunfelder + 1 (bei 6 Feldern also 7 Zwischenpfosten).',
+      'Eck- und Endpfosten ersetzen Zwischenpfosten – die Anzahl passt sich automatisch an. Sie können den Wert jederzeit selbst ändern.',
     ],
   },
 
   eckpfosten: {
+    title: 'Eckpfosten',
     text: 'Ein Eckpfosten pro 90°-Ecke. Er hat Nuten an zwei angrenzenden Seiten und ersetzt dort einen Zwischenpfosten.',
   },
 
   endpfosten: {
+    title: 'Endpfosten',
     text: [
-      'Jeder Zaunzug braucht an Anfang und Ende einen Endpfosten – daher mindestens 2.',
-      'Jede Unterbrechung (z. B. für ein Tor oder einen Durchgang) braucht 2 weitere Endpfosten – deshalb immer eine gerade Anzahl.',
+      'Endpfosten setzen Sie am Anfang und Ende eines Zaunzugs sowie neben Toren oder Durchgängen ein. Die Anzahl ist frei wählbar.',
+      'Je 2 Endpfosten ersetzen 1 Zwischenpfosten: 1 Endpfosten → keine Änderung, 2 oder 3 → 1 Zwischenpfosten weniger, 4 → 2 weniger usw.',
+      'Wenn Sie ein Tor hinzufügen, ergänzen wir automatisch 2 Endpfosten – je einen links und rechts der Toröffnung.',
     ],
   },
 
@@ -98,7 +109,7 @@ export const INFO = {
     title: 'Tor',
     text: [
       'Tor mit 100 cm Breite, wählbar in 180 oder 200 cm Höhe. Scharniere, Riegel und Schloss aus Edelstahl.',
-      'Planen Sie für die Toröffnung 2 zusätzliche Endpfosten ein (Schritt 05).',
+      'Mit dem Tor werden automatisch 2 Endpfosten ergänzt (Schritt 05) – je einer links und rechts der Toröffnung.',
     ],
     link: { href: `${SITE}/ratgeber/tore/`, label: 'Tor- und Türmontage' },
   },
@@ -145,8 +156,8 @@ export const INFO = {
   holzPfosten: {
     title: 'Pfosten Holz-Beton',
     text: [
-      'Holz-Beton-Pfosten gibt es in Naturgrau und Schwarz/Coating. Zwischenpfosten werden automatisch berechnet.',
-      'Endpfosten schließen einen Zaunzug ab, Eckpfosten verbinden zwei Zaunzüge im 90°-Winkel.',
+      'Holz-Beton-Pfosten gibt es in Naturgrau und Schwarz/Coating.',
+      'Zwischenpfosten berechnen wir aus Ihrer Zaunlänge vor. Endpfosten schließen einen Zaunzug ab (z. B. am Zaunende oder neben einem Tor), Eckpfosten verbinden zwei Zaunzüge im 90°-Winkel. Alle Werte können Sie selbst anpassen.',
     ],
   },
 
@@ -154,7 +165,7 @@ export const INFO = {
     title: 'Holz-Tor',
     text: [
       'Tor in derselben Holzart wie der Sichtschutz, 100 oder 120 cm breit.',
-      'Torrahmen und Plattenkloben (Befestigung am Betonpfosten) werden automatisch mitbestellt.',
+      'Torrahmen und Plattenkloben (Befestigung am Betonpfosten) werden automatisch mitbestellt, dazu 2 Endpfosten (Schritt 06) für beide Seiten der Toröffnung.',
     ],
     link: { href: `${SITE}/torrahmen/`, label: 'Torrahmen ansehen' },
   },

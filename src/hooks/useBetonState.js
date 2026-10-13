@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { AVAILABILITY, MOTIFS_BY_PLATE, BUILD_HEIGHTS } from '../data/betonData.js'
-import { normaliseEndpfosten } from '../utils/calculations.js'
+import { calcSections, calcPfosten } from '../utils/calculations.js'
 import { hasPlateVariant } from '../data/variantIds.js'
 
 export function useBetonState() {
@@ -11,7 +11,8 @@ export function useBetonState() {
   const [laenge,         setLaenge]         = useState(10)
   const [postenFarbe,    setPostenFarbe]    = useState('Naturgrau')
   const [eckpfosten,     setEckpfosten]     = useState(0)
-  const [endpfosten,     setEndpfosten]     = useState(2)
+  const [endpfosten,     setEndpfosten]     = useState(0)  // no preselection
+  const [zwischenDelta,  setZwischenDelta]  = useState(0)
   const [kappe,          setKappe]          = useState('none')
   const [kappeFarbe,     setKappeFarbe]     = useState('Naturgrau')
   const [abdeckung,      setAbdeckung]      = useState('none')
@@ -89,18 +90,40 @@ export function useBetonState() {
     setFarbe(val)
   }
 
-  function handleSetEndpfosten(val, dir = 1) {
-    setEndpfosten(normaliseEndpfosten(val, dir))
+  // ── Pfosten ──────────────────────────────────────────────────────────────
+  // Zwischenpfosten are suggested from the fence length (sections + 1) and
+  // adjusted by Eck-/Endpfosten; the customer can override the suggestion.
+  // A new length resets that override.
+  const pfosten = calcPfosten(calcSections(laenge), eckpfosten, endpfosten, zwischenDelta)
+
+  useEffect(() => {
+    setZwischenDelta(0)
+  }, [laenge])
+
+  function handleSetZwischenpfosten(val) {
+    setZwischenDelta(Math.max(0, val) - pfosten.autoZwischen)
+  }
+
+  function handleSetEndpfosten(val) {
+    setEndpfosten(Math.max(0, val))
   }
 
   function handleSetEckpfosten(val) {
     setEckpfosten(Math.max(0, val))
   }
 
+  // A gate needs an Endpfosten on each side of the opening
+  function handleSetTorSize(next) {
+    if (!torSize && next) setEndpfosten(e => e + 2)
+    if (torSize && !next) setEndpfosten(e => Math.max(0, e - 2))
+    setTorSize(next)
+  }
+
   return {
+    pfosten,
     // state
     motif, plateHeight, buildHeight, seiten, farbe,
-    laenge, postenFarbe, eckpfosten, endpfosten,
+    laenge, postenFarbe, eckpfosten, endpfosten, zwischenDelta,
     kappe, kappeFarbe, abdeckung, abdeckungFarbe,
     montage, beton, betonLocked, torSize, brilluxColor,
     torFarbe, kabelkanal,
@@ -115,13 +138,14 @@ export function useBetonState() {
     setPostenFarbe,
     setEckpfosten: handleSetEckpfosten,
     setEndpfosten: handleSetEndpfosten,
+    setZwischenpfosten: handleSetZwischenpfosten,
     setKappe,
     setKappeFarbe,
     setAbdeckung,
     setAbdeckungFarbe,
     setMontage,
     setBeton,
-    setTorSize,
+    setTorSize: handleSetTorSize,
     setBrilluxColor,
     torFarbe, setTorFarbe,
     kabelkanal, setKabelkanal,

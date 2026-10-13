@@ -1,23 +1,13 @@
 import React from 'react'
-import { normaliseEndpfosten } from '../../utils/calculations.js'
 import InfoTip from './InfoTip.jsx'
 
-export default function Counter({ label, sub, info, value, min = 0, onChange, isEnd = false }) {
+export default function Counter({ label, sub, info, value, min = 0, onChange }) {
   function adjust(delta) {
-    let next = value + delta
-    if (isEnd) {
-      next = normaliseEndpfosten(next, delta)
-    } else {
-      next = Math.max(min, next)
-    }
-    onChange(next, delta)
+    onChange(Math.max(min, value + delta))
   }
 
   function onInput(e) {
-    let val = parseInt(e.target.value) || min
-    if (isEnd) val = normaliseEndpfosten(val, 1)
-    else val = Math.max(min, val)
-    onChange(val, 1)
+    onChange(Math.max(min, parseInt(e.target.value) || min))
   }
 
   return (

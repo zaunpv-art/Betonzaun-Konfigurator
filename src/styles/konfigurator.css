@@ -1544,3 +1544,24 @@ input:checked + .slider::before { transform: translateX(18px); }
 
 .montage-details p + p { margin-top: .4rem; }
 .montage-disclaimer { color: #9a3412; }
+
+/* ─── ZWISCHENPFOSTEN COUNTER (full width, above Eck/End) ─── */
+.counter-zwischen .counter-item { max-width: calc(50% - .375rem); }
+
+.counter-reset {
+  margin-top: .35rem;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--blue);
+  cursor: pointer;
+}
+
+.counter-reset:hover { text-decoration: underline; }
+
+@media (max-width: 600px) {
+  .counter-zwischen .counter-item { max-width: calc(50% - .25rem); }
+}
