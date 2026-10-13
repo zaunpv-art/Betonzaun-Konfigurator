@@ -18,6 +18,11 @@ export default function PfostenCounters({ state }) {
 
   const adjusted = pfosten.zwischen !== pfosten.autoZwischen
 
+  // Kabelkanalzwischenpfosten take the place of normal Zwischenpfosten, so the
+  // Zwischenpfosten counter shows only the normal ones (same split as cart.js)
+  const kabelCount = Math.min(kabelkanal || 0, pfosten.zwischen)
+  const normal     = pfosten.zwischen - kabelCount
+
   return (
     <>
       <div className="counter-grid">
@@ -26,9 +31,9 @@ export default function PfostenCounters({ state }) {
             label="Zwischenpfosten"
             sub="zwischen zwei Zaunfeldern"
             info={INFO.zwischenpfosten}
-            value={pfosten.zwischen}
+            value={normal}
             min={0}
-            onChange={setZwischenpfosten}
+            onChange={val => setZwischenpfosten(val + kabelCount)}
           />
           {adjusted && (
             <button
@@ -36,7 +41,7 @@ export default function PfostenCounters({ state }) {
               className="counter-reset"
               onClick={() => setZwischenpfosten(pfosten.autoZwischen)}
             >
-              ↺ Vorschlag übernehmen ({pfosten.autoZwischen})
+              ↺ Vorschlag übernehmen ({Math.max(0, pfosten.autoZwischen - kabelCount)})
             </button>
           )}
         </div>
@@ -45,9 +50,9 @@ export default function PfostenCounters({ state }) {
             label={<>Kabelkanal&shy;zwischenpfosten</>}
             sub="ersetzt Zwischenpfosten"
             info={INFO.kabelkanal}
-            value={kabelkanal}
+            value={kabelCount}
             min={0}
-            onChange={setKabelkanal}
+            onChange={val => setKabelkanal(Math.min(Math.max(0, val), pfosten.zwischen))}
           />
         )}
       </div>
