@@ -6,6 +6,7 @@ import BeidseitigNote from '../shared/BeidseitigNote.jsx'
 import { HOLZ_MOTIFS } from '../../data/holzData.js'
 import { COLORS } from '../../data/betonData.js'
 import { hasPlateVariant } from '../../data/variantIds.js'
+import { INFO } from '../../data/infoTexts.js'
 
 // Sockel is always a 26 cm plate — grey out motifs not yet in Shopify
 const DISABLED = HOLZ_MOTIFS.map(m => m.id).filter(id => !hasPlateVariant('26', id))
@@ -15,7 +16,7 @@ export default function HolzStepMotif({ state }) {
   const { motif, farbe, seiten, setMotif, setFarbe } = state
 
   return (
-    <Step num="02" title="Beton-Motiv wählen" sub="Motiv und Farbe der Betonplatte (26 cm Sockel)">
+    <Step num="02" title="Beton-Motiv wählen" sub="Motiv und Farbe der Betonplatte (26 cm Sockel)" info={INFO.holzSockel}>
       <MotifGrid
         motifs={HOLZ_MOTIFS}
         activeId={motif}

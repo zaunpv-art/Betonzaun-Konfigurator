@@ -2,6 +2,8 @@ import React from 'react'
 import Step from '../shared/Step.jsx'
 import TogglePills from '../shared/TogglePills.jsx'
 import { BUILD_HEIGHTS } from '../../data/betonData.js'
+import { INFO } from '../../data/infoTexts.js'
+import InfoTip from '../shared/InfoTip.jsx'
 
 export default function StepHeight({ state }) {
   const { plateHeight, buildHeight, setPlateHeight, setBuildHeight } = state
@@ -31,7 +33,7 @@ export default function StepHeight({ state }) {
   return (
     <Step num="02" title="Plattenhöhe & Bauhöhe" sub="Plattenformat und Gesamthöhe des Zauns">
       <div className="label-row">
-        <span className="field-label">Plattenhöhe</span>
+        <span className="field-label">Plattenhöhe <InfoTip {...INFO.plattenhoehe} /></span>
         <span className="field-val">{plateHeight} cm</span>
       </div>
       <div className="plate-pills">
@@ -39,7 +41,7 @@ export default function StepHeight({ state }) {
       </div>
 
       <div className="label-row" style={{ marginTop: '1.1rem' }}>
-        <span className="field-label">Bauhöhe</span>
+        <span className="field-label">Bauhöhe <InfoTip {...INFO.bauhoehe} /></span>
         <span className="field-val">{buildHeight} cm</span>
       </div>
       <div className="height-options">

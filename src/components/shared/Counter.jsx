@@ -1,7 +1,8 @@
 import React from 'react'
 import { normaliseEndpfosten } from '../../utils/calculations.js'
+import InfoTip from './InfoTip.jsx'
 
-export default function Counter({ label, sub, value, min = 0, onChange, isEnd = false }) {
+export default function Counter({ label, sub, info, value, min = 0, onChange, isEnd = false }) {
   function adjust(delta) {
     let next = value + delta
     if (isEnd) {
@@ -21,7 +22,7 @@ export default function Counter({ label, sub, value, min = 0, onChange, isEnd = 
 
   return (
     <div className="counter-item">
-      <div className="counter-label">{label}</div>
+      <div className="counter-label">{label}{info && <InfoTip {...info} />}</div>
       {sub && <div className="counter-sub">{sub}</div>}
       <div className="counter-wrap">
         <button className="cnt-btn" onClick={() => adjust(-1)}>−</button>

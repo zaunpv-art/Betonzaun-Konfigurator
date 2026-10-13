@@ -1,6 +1,7 @@
 import React from 'react'
 import Step from '../shared/Step.jsx'
 import { HOLZ_MATERIALS } from '../../data/holzData.js'
+import { INFO } from '../../data/infoTexts.js'
 
 const MATERIAL_IMAGES = {
   RedClass:    'https://cdn.shopify.com/s/files/1/1029/2848/2568/files/holz_sichtschutz-52.png?v=1772935088',
@@ -36,7 +37,7 @@ export default function HolzStepMaterial({ state }) {
   const { holzMaterial, holzCm, setHolzMaterial } = state
 
   return (
-    <Step num="01" title="Holzart wählen" sub="Holzart für den Sichtschutz">
+    <Step num="01" title="Holzart wählen" sub="Holzart für den Sichtschutz" info={INFO.holzart}>
       <div className="material-options">
         {HOLZ_MATERIALS.map(m => (
           <MaterialCard

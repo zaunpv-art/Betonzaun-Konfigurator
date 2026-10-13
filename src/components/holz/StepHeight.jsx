@@ -2,6 +2,7 @@ import React from 'react'
 import Step from '../shared/Step.jsx'
 import TogglePills from '../shared/TogglePills.jsx'
 import { HOLZ_HEIGHT_CONFIG } from '../../data/holzData.js'
+import { INFO } from '../../data/infoTexts.js'
 
 export default function HolzStepHeight({ state }) {
   const { buildHeight, betonPlatten, setBuildHeight, setBetonPlatten } = state
@@ -20,7 +21,7 @@ export default function HolzStepHeight({ state }) {
   })) || []
 
   return (
-    <Step num="03" title="Bauhöhe" sub="Gesamthöhe des Holz-Betonzauns">
+    <Step num="03" title="Bauhöhe" sub="Gesamthöhe des Holz-Betonzauns" info={INFO.holzBauhoehe}>
       <TogglePills options={heightOptions} activeId={buildHeight} onSelect={setBuildHeight} />
 
       {show206Options && (

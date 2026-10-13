@@ -2,13 +2,14 @@ import React from 'react'
 import Step from '../shared/Step.jsx'
 import ColorPills from '../shared/ColorPills.jsx'
 import { COLORS } from '../../data/betonData.js'
+import { INFO } from '../../data/infoTexts.js'
 
 export default function StepFarbe({ state }) {
   const { farbe, allowedColors, setFarbe } = state
   const disabledIds = COLORS.map(c => c.id).filter(id => !allowedColors.includes(id))
 
   return (
-    <Step num="03" title="Farbe" sub="Wählen Sie die Farbe Ihrer Platten">
+    <Step num="03" title="Farbe" info={INFO.farbe} sub="Wählen Sie die Farbe Ihrer Platten">
       <ColorPills
         colors={COLORS}
         activeId={farbe}

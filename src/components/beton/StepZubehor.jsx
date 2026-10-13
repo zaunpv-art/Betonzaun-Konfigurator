@@ -5,6 +5,8 @@ import ColorPills from '../shared/ColorPills.jsx'
 import { BETON_BAGS } from '../../data/betonData.js'
 import { COLORS } from '../../data/betonData.js'
 import { calcSections, calcPfosten } from '../../utils/calculations.js'
+import { INFO } from '../../data/infoTexts.js'
+import InfoTip from '../shared/InfoTip.jsx'
 
 export default function StepZubehor({ state, stepNum = '09' }) {
   const {
@@ -21,8 +23,8 @@ export default function StepZubehor({ state, stepNum = '09' }) {
   const totalBags    = bags * pfosten.total
 
   const torOptions = [
-    { id: '180', label: 'Tor 180 cm' },
-    { id: '200', label: 'Tor 200 cm' },
+    { id: '180', label: 'Höhe 180 cm' },
+    { id: '200', label: 'Höhe 200 cm' },
   ]
 
   return (
@@ -34,6 +36,10 @@ export default function StepZubehor({ state, stepNum = '09' }) {
           <div className="zubehor-info">
             <div className="zubehor-title">
               Trockenbeton
+              <InfoTip
+                {...INFO.trockenbeton}
+                text={[...INFO.trockenbeton.text, `Für Ihren Zaun: ${totalBags} Säcke (${bags} pro Pfosten × ${pfosten.total} Pfosten).`]}
+              />
               {betonLocked && <span className="optional-badge" style={{ background: '#fef3c7', color: '#92400e' }}>Inklusive</span>}
             </div>
             <div className="zubehor-desc">Einbeton für die Pfosten</div>
@@ -50,7 +56,7 @@ export default function StepZubehor({ state, stepNum = '09' }) {
       <div className="zubehor-item">
         <div className="zubehor-row">
           <div className="zubehor-info">
-            <div className="zubehor-title">Tor <span className="optional-badge">Optional</span></div>
+            <div className="zubehor-title">Tor <span className="optional-badge">Optional</span><InfoTip {...INFO.tor} /></div>
             <div className="zubehor-desc">Einfahrts- oder Gartentor hinzufügen</div>
           </div>
           <label className="toggle-switch">
@@ -82,7 +88,7 @@ export default function StepZubehor({ state, stepNum = '09' }) {
       <div className="zubehor-item">
         <div className="zubehor-row">
           <div className="zubehor-info">
-            <div className="zubehor-title">Farbe Brillux <span className="optional-badge">Optional</span></div>
+            <div className="zubehor-title">Farbe Brillux <span className="optional-badge">Optional</span><InfoTip {...INFO.brillux} /></div>
             <div className="zubehor-desc">Individuelle Farbgestaltung · 1 Eimer (15L) pro 10 m</div>
           </div>
           <label className="toggle-switch">

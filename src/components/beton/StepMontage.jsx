@@ -1,5 +1,6 @@
 import React from 'react'
 import Step from '../shared/Step.jsx'
+import { MONTAGE_INFO } from '../../data/infoTexts.js'
 
 const OPTIONS = [
   {
@@ -43,10 +44,16 @@ export default function StepMontage({ state, stepNum = '08' }) {
         ))}
       </div>
 
-      {/* Disclaimer shown when Montagehilfe is selected */}
-      {activeOption?.disclaimer && (
-        <div className="info-note visible" style={{ marginTop: '.75rem' }}>
-          ℹ️ {activeOption.disclaimer}
+      {/* Details for the selected option */}
+      {MONTAGE_INFO[montage] && (
+        <div className="montage-details">
+          <p>{MONTAGE_INFO[montage].text}</p>
+          {activeOption?.disclaimer && <p className="montage-disclaimer">ℹ️ {activeOption.disclaimer}</p>}
+          {MONTAGE_INFO[montage].link && (
+            <a href={MONTAGE_INFO[montage].link.href} target="_blank" rel="noopener noreferrer" className="info-tip-link">
+              {MONTAGE_INFO[montage].link.label} →
+            </a>
+          )}
         </div>
       )}
     </Step>

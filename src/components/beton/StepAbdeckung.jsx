@@ -3,6 +3,8 @@ import Step from '../shared/Step.jsx'
 import TogglePills from '../shared/TogglePills.jsx'
 import ColorPills from '../shared/ColorPills.jsx'
 import { COLORS } from '../../data/betonData.js'
+import { INFO } from '../../data/infoTexts.js'
+
 import { calcSections } from '../../utils/calculations.js'
 
 const OPTIONS = [
@@ -20,7 +22,7 @@ export default function StepAbdeckung({ state }) {
   const sections = calcSections(laenge)
 
   return (
-    <Step num="07" title={<>Abdeckungen <span className="optional-badge">Optional</span></>} sub="Abdeckung oben auf jedem Zaunfeld">
+    <Step num="07" title={<>Abdeckungen <span className="optional-badge">Optional</span></>} sub="Abdeckung oben auf jedem Zaunfeld" info={INFO.abdeckung}>
       <TogglePills options={OPTIONS} activeId={abdeckung} onSelect={setAbdeckung} />
 
       {abdeckung !== 'none' && (

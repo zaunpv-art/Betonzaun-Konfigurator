@@ -2,10 +2,11 @@ import React from 'react'
 import Step from '../shared/Step.jsx'
 import TogglePills from '../shared/TogglePills.jsx'
 import { HOLZ_MATERIALS } from '../../data/holzData.js'
+import { INFO } from '../../data/infoTexts.js'
 
 const TOR_SIZES = [
-  { id: '100', label: '100 cm' },
-  { id: '120', label: '120 cm' },
+  { id: '100', label: 'Breite 100 cm' },
+  { id: '120', label: 'Breite 120 cm' },
 ]
 
 export default function HolzStepTor({ state }) {
@@ -13,7 +14,7 @@ export default function HolzStepTor({ state }) {
   const materialLabel = HOLZ_MATERIALS.find(m => m.id === holzMaterial)?.label || holzMaterial
 
   return (
-    <Step num="07" title={<>Holz-Tor <span className="optional-badge">Optional</span></>} sub="Tor in gleicher Holzart wie Sichtschutz">
+    <Step num="07" title={<>Holz-Tor <span className="optional-badge">Optional</span></>} sub="Tor in gleicher Holzart wie Sichtschutz" info={INFO.holzTor}>
       <div className="zubehor-row">
         <div className="zubehor-info">
           <div className="zubehor-title">Tor hinzufügen</div>

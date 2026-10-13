@@ -2,6 +2,8 @@ import React from 'react'
 import Step from '../shared/Step.jsx'
 import { HOLZ_BETON_BAGS_PER_PFOSTEN } from '../../data/holzData.js'
 import { calcSections, calcPfosten } from '../../utils/calculations.js'
+import { INFO } from '../../data/infoTexts.js'
+import InfoTip from '../shared/InfoTip.jsx'
 
 export default function HolzStepZubehor({ state }) {
   const { beton, setBeton, betonLocked, laenge, eckpfosten, endpfosten } = state
@@ -16,6 +18,10 @@ export default function HolzStepZubehor({ state }) {
           <div className="zubehor-info">
             <div className="zubehor-title">
               Trockenbeton
+              <InfoTip
+                {...INFO.trockenbeton}
+                text={[...INFO.trockenbeton.text, `Für Ihren Zaun: ${totalBags} Säcke (${HOLZ_BETON_BAGS_PER_PFOSTEN} pro Pfosten × ${pfosten.total} Pfosten).`]}
+              />
             </div>
             <div className="zubehor-desc">Einbeton für die Pfosten</div>
           </div>
