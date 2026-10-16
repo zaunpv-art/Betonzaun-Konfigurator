@@ -52,9 +52,9 @@ export const PLATE_VARIANTS = {
     },
     Mosaik: {
       beidseitig: {
-        Naturgrau: '', // 26cm not in Shopify yet
-        Anthrazit: '',
-        Schwarz:   '',
+        Naturgrau: '59125626536200',
+        Anthrazit: '59125626568968',
+        Schwarz:   '59125626601736',
       },
     },
     Lamella: {
@@ -66,9 +66,9 @@ export const PLATE_VARIANTS = {
     },
     Mikado: {
       beidseitig: {
-        Naturgrau: '', // 26cm not in Shopify yet
-        Anthrazit: '',
-        Schwarz:   '',
+        Naturgrau: '59125758165256',
+        Anthrazit: '59125758198024',
+        Schwarz:   '59125758230792',
       },
     },
   },

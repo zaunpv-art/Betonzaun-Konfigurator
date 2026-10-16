@@ -7,6 +7,7 @@ export const HOLZ_MOTIFS = [
   { id: 'Modern',    label: 'Modern',    swatch: 's-modern'    },
   { id: 'Lamella',   label: 'Lamella',   swatch: 's-lamella'   },
   { id: 'Mosaik',    label: 'Mosaik',    swatch: 's-mosaik'    },
+  { id: 'Mikado',    label: 'Mikado',    swatch: 's-mikado'    },
 ]
 
 export const HOLZ_MATERIALS = [
