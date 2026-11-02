@@ -3,11 +3,14 @@ import TypeSwitcher from './components/TypeSwitcher.jsx'
 import BetonKonfigurator from './components/beton/BetonKonfigurator.jsx'
 import HolzKonfigurator from './components/holz/HolzKonfigurator.jsx'
 import PriceBar from './components/PriceBar.jsx'
+import BeratungCard from './components/BeratungCard.jsx'
+import BeratungModal from './components/BeratungModal.jsx'
 import GalleryPanel from './components/GalleryPanel.jsx'
 import { useBetonState } from './hooks/useBetonState.js'
 import { useHolzState } from './hooks/useHolzState.js'
 import { buildBetonLineItems, buildHolzLineItems } from './utils/cart.js'
-import { useShopifyPrices } from './hooks/useShopifyPrice.js'
+import { useShopifyPrices, calcTotal } from './hooks/useShopifyPrice.js'
+import { captureAttribution } from './utils/tracking.js'
 
 // Valid values for URL params
 const BETON_MOTIFS   = ['Fels','Nostalgie','Romania','Schiefer','Holzoptik','Modern','Mosaik','Lamella','Mikado']
@@ -58,8 +61,14 @@ function updateHash(type, param) {
 
 export default function App() {
   const [activeType, setActiveType] = useState('beton')
+  const [beratungOpen, setBeratungOpen] = useState(false)
   const betonState = useBetonState()
   const holzState  = useHolzState()
+
+  // ── Keep the click id / campaign tags of this visit for the lead form ───
+  useEffect(() => {
+    captureAttribution()
+  }, [])
 
   // ── Read initial hash on mount ──────────────────────────────────────────
   useEffect(() => {
@@ -119,6 +128,10 @@ export default function App() {
 
   const { priceFn } = useShopifyPrices()
 
+  // Same total the price bar shows, so the request carries the quoted price
+  const leadTotal    = calcTotal(lineItems, priceFn)
+  const leadHasTotal = lineItems.some(i => i.fixedPrice != null || priceFn(i.variantId) != null)
+
   return (
     <div className="app">
       <TypeSwitcher activeType={activeType} onChange={handleTypeChange} />
@@ -143,6 +156,9 @@ export default function App() {
             ? <BetonKonfigurator state={betonState} />
             : <HolzKonfigurator  state={holzState}  />
           }
+
+          {/* Second path for anyone who is unsure — above the price bar */}
+          <BeratungCard onOpen={() => setBeratungOpen(true)} />
         </div>
       </div>
 
@@ -151,6 +167,17 @@ export default function App() {
         activeType={activeType}
         betonState={betonState}
         holzState={holzState}
+      />
+
+      <BeratungModal
+        open={beratungOpen}
+        onClose={() => setBeratungOpen(false)}
+        activeType={activeType}
+        state={activeType === 'beton' ? betonState : holzState}
+        items={lineItems}
+        priceFn={priceFn}
+        total={leadTotal}
+        hasTotal={leadHasTotal}
       />
     </div>
   )

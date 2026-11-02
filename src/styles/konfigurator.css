@@ -1565,3 +1565,323 @@ input:checked + .slider::before { transform: translateX(18px); }
 }
 
 .counter-reset:hover { text-decoration: underline; }
+
+
+/* ═══════════════════════════════════════════════
+   BERATUNG ANFRAGEN — card + form
+═══════════════════════════════════════════════ */
+
+/* ─── Card at the end of the steps ─── */
+.beratung-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem 1.4rem;
+  margin-bottom: .75rem;
+  box-shadow: var(--shadow-sm);
+  text-align: center;
+}
+
+.beratung-card-text {
+  font-size: .94rem;
+  line-height: 1.5;
+  color: var(--gray-500);
+  margin-bottom: 1rem;
+}
+
+.beratung-card-text strong {
+  color: var(--gray-900);
+  font-family: 'Ubuntu', sans-serif;
+  font-weight: 700;
+}
+
+.beratung-card-btn {
+  width: 100%;
+  padding: .8rem 1.5rem;
+  background: var(--white);
+  color: var(--gray-900);
+  border: 1.5px solid var(--gray-300);
+  border-radius: var(--radius);
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .2s;
+}
+
+.beratung-card-btn:hover {
+  border-color: var(--fuchsia);
+  color: var(--fuchsia);
+  background: var(--fuchsia-pale);
+}
+
+/* ─── Dialog ─── */
+.beratung-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100001; /* above the price bar and the tooltips */
+  background: rgba(15,23,42,.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+  overflow-y: auto;
+  animation: beratungFade .18s ease;
+}
+
+@keyframes beratungFade { from { opacity: 0 } to { opacity: 1 } }
+
+.beratung-dialog {
+  width: min(560px, 100%);
+  max-height: calc(100vh - 3rem);
+  display: flex;
+  flex-direction: column;
+  background: var(--white);
+  border-radius: 1rem;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  animation: beratungIn .2s ease;
+}
+
+@keyframes beratungIn {
+  from { opacity: 0; transform: translateY(12px) }
+  to   { opacity: 1; transform: translateY(0) }
+}
+
+.beratung-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 1.3rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.beratung-head h2 {
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+.beratung-close {
+  background: none;
+  border: none;
+  font-size: 1.7rem;
+  line-height: 1;
+  color: var(--gray-400);
+  cursor: pointer;
+  padding: 0 .25rem;
+}
+
+.beratung-close:hover { color: var(--gray-900); }
+
+.beratung-body,
+.beratung-success {
+  padding: 1.2rem 1.3rem 1.4rem;
+  overflow-y: auto;
+}
+
+.beratung-intro {
+  font-size: .88rem;
+  line-height: 1.5;
+  color: var(--gray-500);
+  margin-bottom: 1rem;
+}
+
+/* ─── Configuration preview ─── */
+.beratung-config {
+  border: 1px solid var(--border);
+  border-radius: .65rem;
+  margin-bottom: 1.1rem;
+  overflow: hidden;
+}
+
+.beratung-config-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+  padding: .7rem .85rem;
+  background: var(--gray-50);
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .86rem;
+  font-weight: 600;
+  color: var(--gray-700);
+  cursor: pointer;
+  text-align: left;
+}
+
+.beratung-config-toggle strong {
+  font-family: 'Ubuntu', sans-serif;
+  color: var(--navy);
+}
+
+.beratung-config-caret { font-size: .62rem; color: var(--gray-400); }
+
+.beratung-config-list { padding: .25rem .85rem .5rem; }
+
+.beratung-config-row {
+  display: flex;
+  justify-content: space-between;
+  gap: .75rem;
+  padding: .3rem 0;
+  border-bottom: 1px solid var(--gray-100);
+  font-size: .82rem;
+}
+
+.beratung-config-row:last-child { border-bottom: none; }
+.beratung-config-row dt { color: var(--gray-400); flex-shrink: 0; }
+.beratung-config-row dd { color: var(--gray-900); text-align: right; font-weight: 500; }
+
+/* ─── Fields ─── */
+.beratung-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .75rem;
+}
+
+.beratung-field { margin-bottom: .75rem; }
+.beratung-grid .beratung-field { margin-bottom: 0; }
+
+.beratung-field label {
+  display: block;
+  font-size: .82rem;
+  font-weight: 600;
+  color: var(--gray-700);
+  margin-bottom: .3rem;
+}
+
+.beratung-optional { font-weight: 400; color: var(--gray-400); }
+
+.beratung-textarea {
+  resize: vertical;
+  min-height: 72px;
+  font-family: 'DM Sans', sans-serif;
+  line-height: 1.5;
+}
+
+.text-input-error { border-color: #dc2626; }
+
+.beratung-error {
+  margin-top: .3rem;
+  font-size: .78rem;
+  color: #dc2626;
+}
+
+.beratung-trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+/* ─── Consent ─── */
+.beratung-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: .6rem;
+  margin-top: 1rem;
+  padding: .75rem .85rem;
+  background: var(--gray-50);
+  border: 1px solid var(--border);
+  border-radius: .65rem;
+}
+
+.beratung-consent.has-error { border-color: #dc2626; }
+
+.beratung-consent input {
+  width: 17px;
+  height: 17px;
+  margin-top: 2px;
+  flex-shrink: 0;
+  accent-color: var(--fuchsia);
+  cursor: pointer;
+}
+
+.beratung-consent label {
+  font-size: .78rem;
+  line-height: 1.5;
+  color: var(--gray-500);
+  cursor: pointer;
+}
+
+.beratung-consent a { color: var(--blue); }
+
+.beratung-senderror {
+  margin-top: .9rem;
+  padding: .6rem .8rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-left: 3px solid #dc2626;
+  border-radius: .55rem;
+  font-size: .82rem;
+  color: #991b1b;
+  line-height: 1.5;
+}
+
+.beratung-submit {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.beratung-note {
+  margin-top: .7rem;
+  font-size: .76rem;
+  color: var(--gray-400);
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* ─── Success ─── */
+.beratung-success { text-align: center; }
+
+.beratung-success-icon {
+  width: 52px;
+  height: 52px;
+  margin: .5rem auto 1rem;
+  border-radius: 50%;
+  background: #dcfce7;
+  color: #16a34a;
+  font-size: 1.7rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.beratung-success-lead {
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: .5rem;
+}
+
+.beratung-success p {
+  font-size: .88rem;
+  line-height: 1.6;
+  color: var(--gray-500);
+}
+
+.beratung-success strong { color: var(--gray-900); }
+
+/* ─── Mobile ─── */
+@media (max-width: 600px) {
+  .beratung-card { padding: 1.1rem 1rem 1.2rem; }
+  .beratung-card-text { font-size: .86rem; }
+  .beratung-card-btn { font-size: .92rem; padding: .75rem 1rem; }
+
+  .beratung-overlay { padding: 0; align-items: flex-end; }
+  .beratung-dialog {
+    width: 100%;
+    max-height: 92vh;
+    border-radius: 1rem 1rem 0 0;
+  }
+  .beratung-grid { grid-template-columns: 1fr; }
+  .beratung-config-row { font-size: .78rem; }
+}
