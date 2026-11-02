@@ -80,7 +80,7 @@ export default function App() {
     if (!lead) return
     setBeratungConfirmed(lead)
     setBeratungOpen(true)
-    trackLeadSubmitted({ type: lead.type, value: lead.value })
+    trackLeadSubmitted({ type: lead.type, total: lead.total, requestId: lead.requestId })
   }, [])
 
   // ── Read initial hash on mount ──────────────────────────────────────────

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { buildConfigFields, buildConfigText, fmtPrice } from '../utils/summary.js'
 import { submitLead, privacyUrl } from '../utils/leadForm.js'
-import { getAttribution, trackLeadSubmitted } from '../utils/tracking.js'
+import { getAttribution, trackLeadSubmitted, newRequestId } from '../utils/tracking.js'
 
 const CONSENT_TEXT =
   'Ich habe die Datenschutzerklärung gelesen und willige ein, dass meine Angaben zur Bearbeitung meiner Anfrage gespeichert und verarbeitet werden. Ich kann diese Einwilligung jederzeit widerrufen.'
@@ -91,7 +91,8 @@ export default function BeratungModal({ open, onClose, activeType, state, items,
 
     try {
       const leadType  = activeType === 'beton' ? 'Betonzaun' : 'Holz-Betonzaun'
-      const leadValue = hasTotal ? Number(total.toFixed(2)) : null
+      const leadTotal = hasTotal ? total : 0   // numeric total from the price calculation
+      const requestId = newRequestId()        // Shopify's contact form returns no id of its own
 
       const result = await submitLead({
         name:    values.name.trim(),
@@ -105,7 +106,7 @@ export default function BeratungModal({ open, onClose, activeType, state, items,
         consentText: CONSENT_TEXT,
         attribution: getAttribution(),
         // Kept for the return trip if Shopify needs a page submit (captcha)
-        pending: { type: leadType, value: leadValue, email: values.email.trim() },
+        pending: { type: leadType, total: leadTotal, requestId, email: values.email.trim() },
       })
 
       // The page is being submitted to Shopify; the thank-you follows on return.
@@ -116,7 +117,7 @@ export default function BeratungModal({ open, onClose, activeType, state, items,
       // conversion event are both true
       setSent(true)
       setSending(false)
-      trackLeadSubmitted({ type: leadType, value: leadValue })
+      trackLeadSubmitted({ type: leadType, total: leadTotal, requestId })
     } catch (err) {
       setSendError(err.message)
       setSending(false)

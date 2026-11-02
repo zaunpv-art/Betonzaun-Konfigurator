@@ -92,36 +92,87 @@ export function getAttribution() {
   return out
 }
 
+// ─── Google Ads conversion ───────────────────────────────────────────────────
+
+const ADS_SEND_TO   = 'AW-10840469103/NqVECKyCvLAdEO_ckbEo'
+const LEAD_SHARE    = 0.2  // lead value = 20 % of the configuration price
+const LEAD_FALLBACK = 100  // € when no price is available
+const FIRED_KEY     = 'betonzaun_leads_tracked'
+
+/** A unique id per request; also stops a double submit from counting twice. */
+export function newRequestId() {
+  return 'cfg-' + Date.now()
+}
+
+/** Lead value in whole euros from the configurator's numeric total. */
+export function leadValueFor(total) {
+  const value = Math.round((Number(total) || 0) * LEAD_SHARE)
+  return value || LEAD_FALLBACK
+}
+
+// Remember tracked request ids for this browser tab, so reopening the
+// thank-you, a reload or a second success callback never counts one twice
+function alreadyTracked(requestId) {
+  if (!requestId) return false
+  try {
+    const ids = JSON.parse(sessionStorage.getItem(FIRED_KEY) || '[]')
+    if (ids.includes(requestId)) return true
+    sessionStorage.setItem(FIRED_KEY, JSON.stringify([...ids, requestId].slice(-20)))
+  } catch {
+    if (alreadyTracked.memory?.has(requestId)) return true
+    ;(alreadyTracked.memory ||= new Set()).add(requestId)
+  }
+  return false
+}
+
 /**
- * Tell the analytics layer that a request was really sent.
- * Fires only from the success state, never on a click or a failed submit, so
- * the conversion counted in Google Ads is a request that actually arrived.
+ * Tell Google Ads and the analytics layer that a request was really sent.
+ *
+ * Called ONLY when the thank-you opens after a confirmed send — never on the
+ * button click, never when sending fails or the form is invalid.
+ *
+ * Uses the gtag.js already on the page (Shopify's Google channel); this bundle
+ * never loads it, which would double-count. Consent is left to the cookie
+ * banner and Google's Consent Mode.
+ *
+ * @param {{ type: string, total: number, requestId: string }} detail
  */
 export function trackLeadSubmitted(detail = {}) {
+  const requestId = detail.requestId || newRequestId()
+  if (alreadyTracked(requestId)) return
+
+  const leadValue = leadValueFor(detail.total)
+
+  if (typeof window.gtag === 'function') {
+    try {
+      window.gtag('event', 'conversion', {
+        send_to:        ADS_SEND_TO,
+        value:          leadValue,
+        currency:       'EUR',
+        transaction_id: requestId,
+      })
+    } catch { /* gtag present but broken — nothing more to do here */ }
+  } else {
+    // No gtag on the page: hand the event to a Shopify custom pixel instead
+    try {
+      window.Shopify?.analytics?.publish?.('configurator_request_sent', {
+        value:      leadValue,
+        request_id: requestId,
+      })
+    } catch { /* not on a Shopify storefront */ }
+  }
+
+  // A DOM event for the theme's own tools. Deliberately no dataLayer push:
+  // the Google tag reads window.dataLayer too, and an extra event there could
+  // count a second conversion.
   const payload = {
-    event:          'beratung_anfrage',
-    konfigurator:   detail.type || '',
-    konfig_wert:    detail.value ?? null,
-    waehrung:       'EUR',
+    konfigurator: detail.type || '',
+    lead_value:   leadValue,
+    request_id:   requestId,
+    waehrung:     'EUR',
     ...getAttribution(),
   }
 
-  try {
-    window.dataLayer = window.dataLayer || []
-    window.dataLayer.push(payload)
-  } catch { /* no dataLayer on the page */ }
-
-  try {
-    if (typeof window.gtag === 'function') {
-      window.gtag('event', 'generate_lead', {
-        currency: 'EUR',
-        value:    detail.value ?? 0,
-        lead_source: 'Konfigurator',
-      })
-    }
-  } catch { /* gtag not loaded */ }
-
-  // Lets the theme hook in its own tracking without touching this bundle
   try {
     window.dispatchEvent(new CustomEvent('betonzaun:lead-submitted', { detail: payload }))
   } catch { /* older browser */ }
