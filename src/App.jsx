@@ -10,7 +10,8 @@ import { useBetonState } from './hooks/useBetonState.js'
 import { useHolzState } from './hooks/useHolzState.js'
 import { buildBetonLineItems, buildHolzLineItems } from './utils/cart.js'
 import { useShopifyPrices, calcTotal } from './hooks/useShopifyPrice.js'
-import { captureAttribution } from './utils/tracking.js'
+import { captureAttribution, trackLeadSubmitted } from './utils/tracking.js'
+import { takeConfirmedLead } from './utils/leadForm.js'
 
 // Valid values for URL params
 const BETON_MOTIFS   = ['Fels','Nostalgie','Romania','Schiefer','Holzoptik','Modern','Mosaik','Lamella','Mikado']
@@ -62,12 +63,24 @@ function updateHash(type, param) {
 export default function App() {
   const [activeType, setActiveType] = useState('beton')
   const [beratungOpen, setBeratungOpen] = useState(false)
+  const [beratungConfirmed, setBeratungConfirmed] = useState(null)
   const betonState = useBetonState()
   const holzState  = useHolzState()
 
   // ── Keep the click id / campaign tags of this visit for the lead form ───
   useEffect(() => {
     captureAttribution()
+  }, [])
+
+  // ── Back from Shopify's contact form with ?contact_posted=true ──────────
+  // (page submit after a captcha): the request arrived — show the thank-you
+  // and count the conversion, once
+  useEffect(() => {
+    const lead = takeConfirmedLead()
+    if (!lead) return
+    setBeratungConfirmed(lead)
+    setBeratungOpen(true)
+    trackLeadSubmitted({ type: lead.type, value: lead.value })
   }, [])
 
   // ── Read initial hash on mount ──────────────────────────────────────────
@@ -171,7 +184,8 @@ export default function App() {
 
       <BeratungModal
         open={beratungOpen}
-        onClose={() => setBeratungOpen(false)}
+        onClose={() => { setBeratungOpen(false); setBeratungConfirmed(null) }}
+        confirmed={beratungConfirmed}
         activeType={activeType}
         state={activeType === 'beton' ? betonState : holzState}
         items={lineItems}

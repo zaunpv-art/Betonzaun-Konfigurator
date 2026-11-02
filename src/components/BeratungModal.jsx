@@ -25,7 +25,7 @@ function validate(values) {
  * they are looking at. The thank-you state appears only once the request was
  * really accepted — that is the moment the conversion is tracked.
  */
-export default function BeratungModal({ open, onClose, activeType, state, items, priceFn, total, hasTotal }) {
+export default function BeratungModal({ open, onClose, activeType, state, items, priceFn, total, hasTotal, confirmed }) {
   const [values, setValues] = useState({ name: '', email: '', phone: '', plz: '', message: '', consent: false })
   const [errors,  setErrors]  = useState({})
   const [sending, setSending] = useState(false)
@@ -36,19 +36,26 @@ export default function BeratungModal({ open, onClose, activeType, state, items,
   const dialogRef = useRef(null)
   const firstRef  = useRef(null)
   const trapRef   = useRef(null)   // honeypot: real people never fill this
+  // The parent passes a new onClose on every render; read it through a ref so
+  // re-renders (e.g. prices arriving) never reset the form while it is open
+  const onCloseRef = useRef(onClose)
+  onCloseRef.current = onClose
 
   const configFields = open ? buildConfigFields(activeType, state) : []
 
   // Reset for a new request, lock the page behind the dialog, focus the first field
   useEffect(() => {
     if (!open) return
-    setErrors({}); setSendError(null); setSent(false); setShowConfig(false)
+    setErrors({}); setSendError(null); setShowConfig(false)
+    // Opened by a confirmed return from Shopify's page submit: straight to the thank-you
+    setSent(!!confirmed)
+    if (confirmed?.email) setValues(v => ({ ...v, email: confirmed.email }))
 
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     const t = setTimeout(() => firstRef.current?.focus(), 60)
 
-    function onKey(e) { if (e.key === 'Escape') onClose() }
+    function onKey(e) { if (e.key === 'Escape') onCloseRef.current() }
     document.addEventListener('keydown', onKey)
 
     return () => {
@@ -56,7 +63,7 @@ export default function BeratungModal({ open, onClose, activeType, state, items,
       document.removeEventListener('keydown', onKey)
       clearTimeout(t)
     }
-  }, [open, onClose])
+  }, [open, confirmed])
 
   if (!open) return null
 
@@ -83,7 +90,10 @@ export default function BeratungModal({ open, onClose, activeType, state, items,
     setSendError(null)
 
     try {
-      await submitLead({
+      const leadType  = activeType === 'beton' ? 'Betonzaun' : 'Holz-Betonzaun'
+      const leadValue = hasTotal ? Number(total.toFixed(2)) : null
+
+      const result = await submitLead({
         name:    values.name.trim(),
         email:   values.email.trim(),
         phone:   values.phone.trim(),
@@ -94,18 +104,21 @@ export default function BeratungModal({ open, onClose, activeType, state, items,
         configText: buildConfigText({ activeType, state, items, priceFn, total, hasTotal }),
         consentText: CONSENT_TEXT,
         attribution: getAttribution(),
+        // Kept for the return trip if Shopify needs a page submit (captcha)
+        pending: { type: leadType, value: leadValue, email: values.email.trim() },
       })
+
+      // The page is being submitted to Shopify; the thank-you follows on return.
+      // Keep the button in its sending state until the browser navigates.
+      if (result?.redirecting) return
 
       // Only now: the request is on its way, so the thank-you and the
       // conversion event are both true
       setSent(true)
-      trackLeadSubmitted({
-        type:  activeType === 'beton' ? 'Betonzaun' : 'Holz-Betonzaun',
-        value: hasTotal ? Number(total.toFixed(2)) : null,
-      })
+      setSending(false)
+      trackLeadSubmitted({ type: leadType, value: leadValue })
     } catch (err) {
       setSendError(err.message)
-    } finally {
       setSending(false)
     }
   }
