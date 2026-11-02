@@ -241,14 +241,54 @@ export function buildHolzLineItems(s) {
 }
 
 // ─── ADD TO SHOPIFY CART ─────────────────────────────────────────────────────
+//
+// Every line of one configuration carries the same visible label
+// ("Betonzaun-Konfigurator · Set 1") and a hidden set id. The first line also
+// lists the customer's selections. Products added on their own carry no label,
+// so cart, checkout and order show at a glance what belongs to which set.
+// Different properties also keep Shopify from merging a set's line with the
+// same product added separately.
 
-export async function addToShopifyCart(lineItems, properties = {}) {
+export const SET_PROPERTY = 'Konfiguration'
+const SET_ID_PROPERTY     = '_konfig_set'   // leading underscore = hidden in cart and checkout
+
+/**
+ * Next free set number for this configurator, counted from what is already in
+ * the cart, so a second configuration becomes "Set 2". Falls back to 1 if the
+ * cart cannot be read; the hidden set id still keeps the sets apart.
+ */
+export async function nextSetNumber(name) {
+  try {
+    const res = await fetch('/cart.js', { headers: { Accept: 'application/json' } })
+    if (!res.ok) return 1
+    const cart = await res.json()
+    let max = 0
+    for (const item of cart.items || []) {
+      const label = item.properties?.[SET_PROPERTY]
+      if (typeof label !== 'string' || !label.startsWith(name)) continue
+      const n = Number(label.match(/Set (\d+)/)?.[1])
+      if (n > max) max = n
+    }
+    return max + 1
+  } catch {
+    return 1
+  }
+}
+
+/**
+ * @param lineItems  configurator lines with a variantId
+ * @param set        { label, id }  the set label and its hidden id
+ * @param firstLine  properties shown on the first line only (selections, notes)
+ */
+export async function addToShopifyCart(lineItems, set, firstLine = {}) {
+  const shared = { [SET_PROPERTY]: set.label, [SET_ID_PROPERTY]: set.id }
+
   const cartItems = lineItems
     .filter(i => i.variantId)
     .map((i, idx) => ({
       id: i.variantId,
       quantity: i.qty,
-      ...(idx === 0 && Object.keys(properties).length > 0 ? { properties } : {}),
+      properties: idx === 0 ? { ...shared, ...firstLine } : shared,
     }))
 
   const res = await fetch('/cart/add.js', {

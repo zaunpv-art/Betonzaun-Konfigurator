@@ -1,7 +1,8 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react'
 import { buildBetonLineItems } from '../utils/cart.js'
 import { buildHolzLineItems }  from '../utils/cart.js'
-import { addToShopifyCart }    from '../utils/cart.js'
+import { addToShopifyCart, nextSetNumber } from '../utils/cart.js'
+import { buildConfigFields } from '../utils/summary.js'
 import { useShopifyPrices, calcTotal } from '../hooks/useShopifyPrice.js'
 
 const fmt = n => n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'
@@ -97,16 +98,29 @@ export default function PriceBar({ activeType, betonState, holzState }) {
     setAdding(true)
     setCartError(null)
 
-    const properties = {}
+    const state = activeType === 'beton' ? betonState : holzState
+    const name  = activeType === 'beton' ? 'Betonzaun-Konfigurator' : 'Holz-Betonzaun-Konfigurator'
+
+    // The customer's selections, shown on the set's first line
+    // (Zaunart is already in the set label)
+    const firstLine = {}
+    for (const { label, value } of buildConfigFields(activeType, state)) {
+      if (label !== 'Zaunart') firstLine[label] = value
+    }
     if (activeType === 'beton' && betonState.brilluxColor?.trim()) {
-      properties['Brillux Farbnummer'] = betonState.brilluxColor.trim()
+      firstLine['Brillux Farbnummer'] = betonState.brilluxColor.trim()
     }
     fixedItems.forEach(i => {
-      properties[i.label] = fmt(i.fixedPrice * i.qty)
+      firstLine[i.label] = fmt(i.fixedPrice * i.qty)
     })
 
     try {
-      await addToShopifyCart(shopifyItems, properties)
+      const number = await nextSetNumber(name)
+      const set = {
+        label: `${name} · Set ${number}`,
+        id:    `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`,
+      }
+      await addToShopifyCart(shopifyItems, set, firstLine)
       window.location.href = '/cart'
     } catch (err) {
       setCartError(err.message)
