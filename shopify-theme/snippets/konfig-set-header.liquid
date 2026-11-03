@@ -1,0 +1,79 @@
+{% comment %}
+  Heading row of a configured set in the cart (Betonzaun- / Holz-Betonzaun-Konfigurator).
+
+  The configurator gives every line of one set the same hidden property
+  "_konfig_set" and the visible label "Konfiguration"; one line also carries
+  the customer's selections. This row shows the set name, those selections
+  and the set total once, above the set's products.
+
+  Accepts:
+  - set_id: {String} value of the _konfig_set property
+  - colspan: {Number} columns of the cart table (cart page 5, drawer 4)
+  - collapsible: {Boolean} show the selections behind "Auswahl anzeigen" (drawer)
+
+  Usage:
+  {% render 'konfig-set-header', set_id: item_set, colspan: 5 %}
+{% endcomment %}
+{%- liquid
+  assign set_label = ''
+  assign set_total = 0
+  assign set_count = 0
+  assign info_item = nil
+  for set_item in cart.items
+    if set_item.properties['_konfig_set'] == set_id
+      assign set_total = set_total | plus: set_item.final_line_price
+      assign set_count = set_count | plus: 1
+      if set_label == blank
+        assign set_label = set_item.properties['Konfiguration']
+      endif
+      if info_item == nil and set_item.properties.size > 2
+        assign info_item = set_item
+      endif
+    endif
+  endfor
+-%}
+<tr class="cart-set" role="row">
+  <td class="cart-set__cell" colspan="{{ colspan }}" role="cell">
+    <div class="cart-set__inner">
+      <div class="cart-set__info">
+        <p class="cart-set__eyebrow caption-with-letter-spacing">
+          Konfiguriertes Set · {{ set_count }} Artikel
+        </p>
+        <p class="cart-set__title h4">{{ set_label | escape }}</p>
+
+        {%- if info_item -%}
+          {%- capture set_options -%}
+            <dl class="cart-set__options">
+              {%- for property in info_item.properties -%}
+                {%- assign property_first_char = property.first | slice: 0 -%}
+                {%- if property.last != blank
+                  and property_first_char != '_'
+                  and property.first != 'Konfiguration'
+                -%}
+                  <div class="product-option">
+                    <dt>{{ property.first | escape }}:</dt>
+                    <dd>{{ property.last | escape }}</dd>
+                  </div>
+                {%- endif -%}
+              {%- endfor -%}
+            </dl>
+          {%- endcapture -%}
+
+          {%- if collapsible -%}
+            <details class="cart-set__details">
+              <summary class="cart-set__summary link">Auswahl anzeigen</summary>
+              {{ set_options }}
+            </details>
+          {%- else -%}
+            {{ set_options }}
+          {%- endif -%}
+        {%- endif -%}
+      </div>
+
+      <div class="cart-set__total">
+        <span class="cart-set__total-label caption-with-letter-spacing">Set-Summe</span>
+        <span class="price price--end">{{ set_total | money }}</span>
+      </div>
+    </div>
+  </td>
+</tr>
