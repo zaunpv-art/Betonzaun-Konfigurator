@@ -21,9 +21,13 @@ What it does:
 - Layout of the current EComposer cart: order steps, product table, note to the
   seller, Profi-Montage banner, trust badges, summary with discount code and AGB
   checkbox, shipping estimate by postcode, contact card.
-- Configurator sets (lines with the hidden property `_konfig_set`) are grouped under
-  one heading with the customer's selections, the set total and "Set entfernen";
-  products added on their own are listed under "Einzelprodukte".
+- One card per configurator set (lines with the hidden property `_konfig_set`):
+  icon, "Betonzaun-Konfigurator · Set 1", "Konfiguriertes Set · N Positionen",
+  "Set entfernen", the selections folded under "Ihre Auswahl anzeigen". Products
+  added on their own go into a separate card "Einzelne Produkte".
+- "Warenkorb leeren" (with confirmation). Dawn's own subtotal box is hidden.
+- Check what the configurator put into the cart: open `/cart?bzdebug=1` — it lists
+  every line with all its properties, also the hidden ones.
 - Quantities, removing, the note and the summary update without reloading.
 - "Angebot anfragen" opens the configurator's consultation form and e-mails the cart
   (grouped by set) through Shopify's contact form, marked as
