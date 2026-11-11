@@ -2,11 +2,19 @@
 
 ## Native cart page (replaces the EComposer cart)
 
-| File | Action |
-| --- | --- |
-| `sections/betonzaun-cart.liquid` | **new** — Sections → Add a new section → `betonzaun-cart` |
-| `snippets/bz-cart-line.liquid` | **new** — Snippets → Add a new snippet → `bz-cart-line` |
-| `templates/cart.json` | replace — Templates → `cart.json` |
+**One file:** paste `sections/main-cart-items.liquid` over the code of the theme's
+existing `sections/main-cart-items.liquid` (Dawn's cart section). No new files, no
+template change: `templates/cart.json` already uses this section, and the file keeps
+Dawn's `color_scheme` / `padding_top` / `padding_bottom` settings so that template
+stays valid.
+
+Steps:
+1. Duplicate the live theme and work on the copy.
+2. EComposer → Pages → Cart → Unpublish, so Shopify serves the theme's own cart again.
+   Check Templates → `cart.json` now lists `"type": "main-cart-items"`.
+3. Paste this file into `sections/main-cart-items.liquid` and save.
+4. Customise → Cart: hide the "Subtotal" section (Dawn's `main-cart-footer`) — the new
+   section has its own summary and checkout button. Add the WhatsApp link.
 
 What it does:
 
@@ -23,9 +31,6 @@ What it does:
   the Google Ads conversion work as in the configurator.
 - Texts, phone, WhatsApp link, colours and links are editable in the theme editor.
 
-Switching over: first turn the EComposer cart page off (EComposer → Pages → Cart →
-Unpublish), otherwise EComposer keeps serving its own cart. Then save the files above.
-
 ## Cart drawer grouping (only if Cart type = Drawer)
 
 | File | Action |
@@ -33,5 +38,3 @@ Unpublish), otherwise EComposer keeps serving its own cart. Then save the files 
 | `snippets/konfig-set-header.liquid` | **new** |
 | `snippets/cart-drawer.liquid` | replace |
 
-`sections/main-cart-items.liquid` is the earlier grouping for Dawn's own cart page;
-it is no longer needed once `templates/cart.json` uses `betonzaun-cart`.
