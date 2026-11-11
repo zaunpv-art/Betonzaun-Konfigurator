@@ -1,18 +1,37 @@
 # Theme files for betonzaun.de (Dawn 15.4)
 
-Group the configurator's cart lines into sets on the cart page and in the cart drawer.
-
-The configurator adds every line of one configuration with the properties
-`Konfiguration` ("Betonzaun-Konfigurator · Set 1") and `_konfig_set` (hidden id);
-one line also carries the customer's selections. These files show one heading
-per set — name, selections, set total — with the set's products indented under it.
-Products added on their own stay as normal rows.
+## Native cart page (replaces the EComposer cart)
 
 | File | Action |
 | --- | --- |
-| `snippets/konfig-set-header.liquid` | **new** — Snippets → Add a new snippet → `konfig-set-header` |
-| `sections/main-cart-items.liquid` | replace (cart page) |
-| `snippets/cart-drawer.liquid` | replace (cart drawer, only if Cart type = Drawer) |
+| `sections/betonzaun-cart.liquid` | **new** — Sections → Add a new section → `betonzaun-cart` |
+| `snippets/bz-cart-line.liquid` | **new** — Snippets → Add a new snippet → `bz-cart-line` |
+| `templates/cart.json` | replace — Templates → `cart.json` |
 
-Based on Dawn 15.4 (`main-cart-items.liquid` matches the shop's copy). Every
-change is marked with a `Konfigurator-Set` comment.
+What it does:
+
+- Layout of the current EComposer cart: order steps, product table, note to the
+  seller, Profi-Montage banner, trust badges, summary with discount code and AGB
+  checkbox, shipping estimate by postcode, contact card.
+- Configurator sets (lines with the hidden property `_konfig_set`) are grouped under
+  one heading with the customer's selections, the set total and "Set entfernen";
+  products added on their own are listed under "Einzelprodukte".
+- Quantities, removing, the note and the summary update without reloading.
+- "Angebot anfragen" opens the configurator's consultation form and e-mails the cart
+  (grouped by set) through Shopify's contact form, marked as
+  "Profi-Montage-Anfrage aus dem Warenkorb". Captcha fallback, consent, gclid/UTM and
+  the Google Ads conversion work as in the configurator.
+- Texts, phone, WhatsApp link, colours and links are editable in the theme editor.
+
+Switching over: first turn the EComposer cart page off (EComposer → Pages → Cart →
+Unpublish), otherwise EComposer keeps serving its own cart. Then save the files above.
+
+## Cart drawer grouping (only if Cart type = Drawer)
+
+| File | Action |
+| --- | --- |
+| `snippets/konfig-set-header.liquid` | **new** |
+| `snippets/cart-drawer.liquid` | replace |
+
+`sections/main-cart-items.liquid` is the earlier grouping for Dawn's own cart page;
+it is no longer needed once `templates/cart.json` uses `betonzaun-cart`.
